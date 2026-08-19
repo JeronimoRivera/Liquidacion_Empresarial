@@ -15,6 +15,7 @@ except Exception:
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from controller.controlador import BaseDeDatos
+from model.calculadora import CalculadoraLiquidacion
 
 # Funciones auxiliares de consola usadas en las vistas
 from view.console.consolacontrolador import (
@@ -259,6 +260,26 @@ def agregar_liquidacion():
         return redirect(url_for('index'))
 
     return render_template(TEMPLATE_AGREGAR_LIQUIDACION)
+
+
+@app.route('/proyeccion_liquidacion', methods=['GET', 'POST'])
+@login_required
+def proyeccion_liquidacion():
+    comparacion = None
+    datos = {}
+    if request.method == 'POST':
+        datos = request.form.to_dict()
+        try:
+            comparacion = CalculadoraLiquidacion().comparar_escenarios(
+                salario_basico=float(request.form['salario_basico']),
+                fecha_inicio_labores=request.form['fecha_inicio_labores'],
+                fecha_salida_actual=request.form['fecha_salida_actual'],
+                fecha_salida_proyectada=request.form['fecha_salida_proyectada'],
+                dias_acumulados_vacaciones=int(request.form['dias_acumulados_vacaciones']),
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            flash(f"No fue posible calcular la proyección: {error}", "error")
+    return render_template('proyeccion_liquidacion.html', comparacion=comparacion, datos=datos)
 
 
 @app.route('/consultar_usuario', methods=['GET', 'POST'])
