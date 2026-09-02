@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("src")
 
 from view_web.flask_app import Run

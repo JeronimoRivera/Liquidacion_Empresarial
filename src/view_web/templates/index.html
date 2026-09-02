@@ -100,6 +100,14 @@
                 </a>
             </div>
 
+            <div class="function-card" style="border: 2px solid #7c3aed; background: linear-gradient(135deg, var(--white) 0%, #f3e8ff 20%);">
+                <h3>Asistente de decisiones</h3>
+                <p>Obtén una recomendación clara sobre si conviene liquidar hoy o esperar otra fecha.</p>
+                <a href="{{ url_for('asistente_decisiones') }}" class="btn btn-primary">
+                    Ver recomendación
+                </a>
+            </div>
+
             <!-- Funciones Administrativas (Solo Administrador) -->
             {% if session.get('rol') == 'administrador' %}
             <div class="function-card" style="border: 2px solid var(--warning-orange);">

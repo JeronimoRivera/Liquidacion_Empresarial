@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Comparador rápido{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('index') }}" class="btn btn-back">Volver al inicio</a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h4>Comparador rápido de salida</h4>
+        <p class="mb-0">Consulta qué pasa si el empleado sale hoy o en una fecha distinta.</p>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% include "_csrf_field.html" %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="salario_basico" class="form-label">Salario básico</label>
+                    <input class="form-control" type="number" min="1" step="0.01" id="salario_basico" name="salario_basico" value="{{ datos.get('salario_basico', '') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="dias_acumulados_vacaciones" class="form-label">Días de vacaciones acumulados</label>
+                    <input class="form-control" type="number" min="0" id="dias_acumulados_vacaciones" name="dias_acumulados_vacaciones" value="{{ datos.get('dias_acumulados_vacaciones', '0') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="fecha_inicio_labores" class="form-label">Inicio de labores</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_inicio_labores" name="fecha_inicio_labores" value="{{ datos.get('fecha_inicio_labores', '') }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="fecha_salida_actual" class="form-label">Fecha actual de salida</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_salida_actual" name="fecha_salida_actual" value="{{ datos.get('fecha_salida_actual', '') }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="fecha_salida_proyectada" class="form-label">Fecha propuesta</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_salida_proyectada" name="fecha_salida_proyectada" value="{{ datos.get('fecha_salida_proyectada', '') }}" required>
+                </div>
+            </div>
+            <button class="btn btn-primary mt-4" type="submit">Comparar ahora</button>
+        </form>
+    </div>
+</div>
+
+{% if comparacion %}
+<div class="card mt-4">
+    <div class="card-header"><h4>Resultado</h4></div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Hoy</th>
+                    <th>Propuesto</th>
+                    <th>Diferencia</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for clave, etiqueta in [('indemnizacion', 'Indemnización'), ('vacaciones', 'Vacaciones'), ('cesantias', 'Cesantías'), ('intereses_cesantias', 'Intereses sobre cesantías'), ('primas', 'Prima de servicios'), ('retencion_fuente', 'Retención en la fuente'), ('total_pagar', 'Total a pagar')] %}
+                <tr>
+                    <td>{{ etiqueta }}</td>
+                    <td>${{ '{:,.2f}'.format(comparacion.actual[clave]) }}</td>
+                    <td>${{ '{:,.2f}'.format(comparacion.proyectado[clave]) }}</td>
+                    <td class="{{ 'text-success' if comparacion.diferencias[clave] >= 0 else 'text-danger' }}">
+                        ${{ '{:,.2f}'.format(comparacion.diferencias[clave]) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

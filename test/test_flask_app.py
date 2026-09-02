@@ -103,3 +103,13 @@ def test_agregar_liquidacion_success_flow(client):
     # Luego, agregar liquidación (ruta usa sólo id_usuario del form)
     resp = client.post("/agregar_liquidacion", data={"id_usuario": "1"}, follow_redirects=False)
     assert resp.status_code in (301, 302)  # Redirige al index si todo sale OK
+
+
+def test_comparador_rapido_route_is_available_for_logged_user(client):
+    login_resp = client.post("/login", data={"id_usuario": "1", "password": "x"}, follow_redirects=False)
+    assert login_resp.status_code in (301, 302)
+
+    resp = client.get("/comparador_rapido")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "Comparador rápido" in body or "Comparar ahora" in body

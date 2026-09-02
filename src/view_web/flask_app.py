@@ -282,6 +282,42 @@ def proyeccion_liquidacion():
     return render_template('proyeccion_liquidacion.html', comparacion=comparacion, datos=datos)
 
 
+@app.route('/asistente_decisiones', methods=['GET', 'POST'])
+@login_required
+def asistente_decisiones():
+    """Asistente de decisiones que recomienda la mejor opción para terminar o continuar la relación laboral."""
+    resultado = None
+    datos = {}
+    if request.method == 'POST':
+        datos = request.form.to_dict()
+        try:
+            salario = float(request.form['salario_basico'])
+            fecha_inicio = request.form['fecha_inicio_labores']
+            fecha_actual = request.form['fecha_salida_actual']
+            fecha_nueva = request.form['fecha_salida_proyectada']
+            dias = int(request.form['dias_acumulados_vacaciones'])
+
+            base = CalculadoraLiquidacion().comparar_escenarios(
+                salario_basico=salario,
+                fecha_inicio_labores=fecha_inicio,
+                fecha_salida_actual=fecha_actual,
+                fecha_salida_proyectada=fecha_nueva,
+                dias_acumulados_vacaciones=dias,
+            )
+
+            diferencia = base['diferencias']['total_pagar']
+            mensaje = "Recomendación: mantener la salida actual." if diferencia <= 0 else "Recomendación: esperar la fecha propuesta para maximizar el valor final."
+
+            resultado = {
+                'comparacion': base,
+                'diferencia_total': diferencia,
+                'mensaje': mensaje,
+            }
+        except (KeyError, TypeError, ValueError) as error:
+            flash(f"No fue posible generar la recomendación: {error}", "error")
+    return render_template('asistente_decisiones.html', resultado=resultado, datos=datos)
+
+
 @app.route('/consultar_usuario', methods=['GET', 'POST'])
 @login_required
 def consultar_usuario():

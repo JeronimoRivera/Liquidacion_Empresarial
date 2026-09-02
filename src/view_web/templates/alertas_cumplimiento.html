@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Alertas de cumplimiento{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('index') }}" class="btn btn-back">Volver al inicio</a>
+</div>
+
+<div class="container">
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h4>Alertas de cumplimiento y riesgo RRHH</h4>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="p-3 border rounded bg-light">
+                        <strong>Total empleados</strong><br>
+                        <span class="h4">{{ resumen.total_empleados }}</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 border rounded bg-light">
+                        <strong>Nomina total</strong><br>
+                        <span class="h4">${{ '{:,.2f}'.format(resumen.total_nomina) }}</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 border rounded bg-light">
+                        <strong>Promedio nómina</strong><br>
+                        <span class="h4">${{ '{:,.2f}'.format(resumen.promedio_nomina) }}</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 border rounded bg-light">
+                        <strong>Alertas activas</strong><br>
+                        <span class="h4">{{ resumen.alertas_activas }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if alertas %}
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h4>Empleados con revisión prioritaria</h4>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Empleado</th>
+                        <th>Documento</th>
+                        <th>Correo</th>
+                        <th>Salario</th>
+                        <th>Riesgo</th>
+                        <th>Motivos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alerta in alertas %}
+                    <tr>
+                        <td>{{ alerta.id }}</td>
+                        <td>{{ alerta.nombre }}</td>
+                        <td>{{ alerta.documento }}</td>
+                        <td>{{ alerta.correo }}</td>
+                        <td>${{ '{:,.2f}'.format(alerta.salario) }}</td>
+                        <td>
+                            {% if alerta.riesgo == 'alto' %}
+                            <span class="badge bg-danger">Alto</span>
+                            {% elif alerta.riesgo == 'medio' %}
+                            <span class="badge bg-warning text-dark">Medio</span>
+                            {% else %}
+                            <span class="badge bg-success">Bajo</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ alerta.motivos | join(', ') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body">
+            <div class="alert alert-success mb-0">
+                No se detectaron alertas de cumplimiento para la nómina actual.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
