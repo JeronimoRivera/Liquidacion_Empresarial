@@ -21,6 +21,10 @@
                 <p>Plataforma Corporativa de Gestión de Recursos Humanos</p>
             </div>
             <div style="display: flex; gap: 1rem; align-items: center;">
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Cambiar modo de color">
+                    <i class="fas fa-sun" aria-hidden="true"></i>
+                    <span>Modo día</span>
+                </button>
                 {% if session.get('user_id') %}
                 <div style="color: white; text-align: right;">
                     <div style="font-size: 0.95rem; font-weight: 500;">
@@ -34,11 +38,11 @@
                         {% endif %}
                     </div>
                 </div>
-                <a href="{{ url_for('logout') }}" class="btn btn-outline" style="padding: 0.6rem 1.2rem;">
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary" style="padding: 0.6rem 1.2rem;">
                     Cerrar Sesión
                 </a>
                 {% endif %}
-                <a href="{{ url_for('index') }}" class="btn btn-outline">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
                     Inicio
                 </a>
             </div>
@@ -99,5 +103,31 @@
             </p>
         </div>
     </footer>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            const toggle = document.getElementById('theme-toggle');
+            const savedTheme = localStorage.getItem('liquidacion-theme');
+
+            if (savedTheme === 'light') {
+                root.dataset.theme = 'light';
+            }
+
+            const updateToggle = () => {
+                const isLight = root.dataset.theme === 'light';
+                toggle.querySelector('i').className = isLight ? 'fas fa-moon' : 'fas fa-sun';
+                toggle.querySelector('span').textContent = isLight ? 'Modo noche' : 'Modo día';
+                toggle.setAttribute('aria-label', isLight ? 'Cambiar a modo noche' : 'Cambiar a modo día');
+            };
+
+            updateToggle();
+            toggle.addEventListener('click', () => {
+                const isLight = root.dataset.theme === 'light';
+                root.dataset.theme = isLight ? 'dark' : 'light';
+                localStorage.setItem('liquidacion-theme', root.dataset.theme);
+                updateToggle();
+            });
+        })();
+    </script>
 </body>
 </html>

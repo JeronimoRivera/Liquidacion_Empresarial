@@ -4,18 +4,12 @@
 
 {% block content %}
 <!-- Hero Section Corporativo -->
-<div class="hero-section" style="
-    background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);
-    color: white;
-    padding: 4rem 0;
-    text-align: center;
-    margin-bottom: 3rem;
-">
+<div class="hero-section">
     <div class="container">
-        <h1 style="font-size: 2.2rem; font-weight: 600; margin-bottom: 1rem; font-family: 'Times New Roman', serif;">
+        <h1>
             Centro de Control Corporativo
         </h1>
-        <p style="font-size: 1.1rem; color: #cbd5e1; font-weight: 300; font-family: 'Times New Roman', serif;">
+        <p>
             Plataforma Integral de Gestión de Liquidaciones Laborales
         </p>
     </div>
@@ -24,7 +18,7 @@
 <div class="container">
     <!-- Información del Usuario Actual -->
     {% if session.get('user_id') %}
-    <div class="card" style="margin-bottom: 3rem; background: linear-gradient(135deg, var(--white) 0%, var(--off-white) 100%);">
+    <div class="card">
         <div class="card-header">
             <h2>
                 Panel de Usuario
@@ -84,17 +78,17 @@
             </div>
 
             <!-- Procesamiento de Liquidaciones -->
-            <div class="function-card" style="border: 2px solid var(--accent-blue); background: linear-gradient(135deg, var(--white) 0%, var(--light-blue) 20%);">
-                <h3 style="color: var(--primary-navy);">Cálculo de Liquidaciones</h3>
+            <div class="function-card">
+                <h3>Cálculo de Liquidaciones</h3>
                 <p>Procese liquidaciones definitivas con cálculos automatizados conforme a la legislación laboral</p>
-                <a href="{{ url_for('agregar_liquidacion') }}" class="btn btn-primary" style="font-size: 1rem; padding: 0.875rem 1.75rem;">
+                <a href="{{ url_for('agregar_liquidacion') }}" class="btn btn-primary">
                     Procesar Liquidación
                 </a>
             </div>
 
             <!-- Funciones Administrativas (Solo Administrador) -->
             {% if session.get('rol') == 'administrador' %}
-            <div class="function-card" style="border: 2px solid var(--warning-orange);">
+            <div class="function-card">
                 <h3>Funciones Administrativas</h3>
                 <p>Acceso completo a funciones de eliminación y gestión avanzada del sistema</p>
                 <div style="display: flex; gap: 0.75rem; justify-content: center;">
@@ -108,10 +102,10 @@
             </div>
 
             <!-- Panel de Control Avanzado -->
-            <div class="function-card" style="background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%); color: white;">
-                <h3 style="color: white;">Panel de Control</h3>
-                <p style="color: #cbd5e1;">Estadísticas del sistema, reportes y herramientas de administración avanzada</p>
-                <a href="{{ url_for('admin_panel') }}" class="btn" style="background: white; color: var(--primary-navy); border: none;">
+            <div class="function-card">
+                <h3>Panel de Control</h3>
+                <p>Estadísticas del sistema, reportes y herramientas de administración avanzada</p>
+                <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
                     Administrar Sistema
                 </a>
             </div>
@@ -128,21 +122,21 @@
         </div>
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
-            <div style="padding: 2rem; background: var(--off-white); border-radius: 8px;">
+            <div class="status-item">
                 <div style="font-size: 2rem; font-weight: 600; color: var(--success-green); margin-bottom: 0.5rem;">
                     Sistema Operativo
                 </div>
                 <div style="font-size: 0.9rem; color: var(--text-medium);">100% Disponibilidad</div>
             </div>
             
-            <div style="padding: 2rem; background: var(--off-white); border-radius: 8px;">
+            <div class="status-item">
                 <div style="font-size: 2rem; font-weight: 600; color: var(--accent-blue); margin-bottom: 0.5rem;">
                     Base de Datos
                 </div>
                 <div style="font-size: 0.9rem; color: var(--text-medium);">Conexión Estable</div>
             </div>
             
-            <div style="padding: 2rem; background: var(--off-white); border-radius: 8px;">
+            <div class="status-item">
                 <div style="font-size: 2rem; font-weight: 600; color: var(--primary-navy); margin-bottom: 0.5rem;">
                     Empleados Activos
                 </div>

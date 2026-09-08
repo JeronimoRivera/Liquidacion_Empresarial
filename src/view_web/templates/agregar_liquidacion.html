@@ -58,6 +58,57 @@
     </div>
 </div>
 
+{% if desglose and liquidacion %}
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h5><i class="fas fa-list-ol"></i> Desglose de la liquidación</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-3">
+            <strong>Días trabajados:</strong> {{ desglose.dias }}
+            <span class="mx-2">|</span>
+            <strong>Años aplicados:</strong> {{ desglose.anios }}
+        </p>
+        <div class="list-group">
+            <div class="list-group-item">
+                <strong>Indemnización</strong><br>
+                ${{ "%.2f"|format(desglose.salario) }} x {{ desglose.anios }} años =
+                <strong>${{ "%.2f"|format(liquidacion[1]) }}</strong>
+            </div>
+            <div class="list-group-item">
+                <strong>Vacaciones</strong><br>
+                ({{ desglose.dias }} / 365) x ${{ "%.2f"|format(desglose.salario_anual) }} x (15 / 365) =
+                <strong>${{ "%.2f"|format(liquidacion[2]) }}</strong>
+            </div>
+            <div class="list-group-item">
+                <strong>Cesantías</strong><br>
+                ({{ desglose.dias }} / 360) x ${{ "%.2f"|format(desglose.salario) }} =
+                <strong>${{ "%.2f"|format(liquidacion[3]) }}</strong>
+            </div>
+            <div class="list-group-item">
+                <strong>Intereses de cesantías</strong><br>
+                ${{ "%.2f"|format(liquidacion[3]) }} x 12% =
+                <strong>${{ "%.2f"|format(liquidacion[4]) }}</strong>
+            </div>
+            <div class="list-group-item">
+                <strong>Prima de servicios</strong><br>
+                ${{ "%.2f"|format(desglose.salario_semestral) }} / 12 =
+                <strong>${{ "%.2f"|format(liquidacion[5]) }}</strong>
+            </div>
+            <div class="list-group-item">
+                <strong>Retención en la fuente</strong><br>
+                (${{ "%.2f"|format(desglose.salario_anual) }} / 12) x {{ (desglose.tasa_retencion * 100)|int }}% =
+                <strong>${{ "%.2f"|format(liquidacion[6]) }}</strong>
+            </div>
+        </div>
+        <div class="alert alert-success mt-3 mb-0">
+            <strong>Total:</strong> indemnización + vacaciones + cesantías + intereses + prima - retención =
+            <strong>${{ "%.2f"|format(liquidacion[7]) }}</strong>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Información sobre el cálculo -->
 <div class="card">
     <div class="card-header bg-info text-white">

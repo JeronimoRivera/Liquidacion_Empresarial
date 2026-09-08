@@ -256,7 +256,24 @@ def agregar_liquidacion():
         else:
             flash("ERROR Error al guardar la liquidación en la base de datos", "error")
 
-        return redirect(url_for('index'))
+        liquidacion = (
+            id_liquidacion, indemnizacion, valor_vacaciones, cesantias,
+            intereses_sobre_cesantias, prima_servicios, retencion_fuente,
+            total_a_pagar
+        )
+        desglose = {
+            'salario': salario,
+            'dias': dias_trabajados_total,
+            'anios': anios_trabajados,
+            'salario_anual': salario_anual,
+            'salario_semestral': salario_semestral,
+            'tasa_retencion': tasa_retencion,
+        }
+        return render_template(
+            TEMPLATE_AGREGAR_LIQUIDACION,
+            liquidacion=liquidacion,
+            desglose=desglose
+        )
 
     return render_template(TEMPLATE_AGREGAR_LIQUIDACION)
 
@@ -295,6 +312,7 @@ def eliminar_usuario():
             flash("Error: No se pudo eliminar el empleado. Verifica que no tenga liquidaciones pendientes.", "error")
 
         return redirect(url_for('index'))
+
     return render_template('eliminar_usuario.html')
 
 
@@ -550,14 +568,14 @@ def reportes():
 @app.route('/exportar_datos')
 @admin_required
 def exportar_datos():
-    """Exportar datos en formato CSV"""
+    """Exportar datos en CSV compatible con Excel."""
     try:
         import csv
         import io
         from datetime import datetime
 
-        output = io.StringIO()
-        writer = csv.writer(output)
+        output = io.StringIO(newline='')
+        writer = csv.writer(output, delimiter=';', lineterminator='\r\n')
 
         bd = BaseDeDatos()
         empleados = bd.obtener_todos_usuarios()
@@ -570,18 +588,17 @@ def exportar_datos():
         writer.writerow(['ID', 'Nombre', 'Apellido', 'Documento', 'Correo', 'Teléfono', 'Fecha Ingreso', 'Fecha Salida', 'Salario', 'Rol'])
         if empleados:
             for emp in empleados:
-                writer.writerow(emp)
+                writer.writerow(emp[:10])
 
         writer.writerow([])
         writer.writerow(['=== LIQUIDACIONES ==='])
-        writer.writerow(['ID Liquidación', 'Indemnización', 'Vacaciones', 'Cesantías', 'Intereses', 'Prima', 'Retención', 'Total', 'ID Empleado'])
+        writer.writerow(['ID Liquidación', 'Indemnización', 'Vacaciones', 'Cesantías', 'Intereses', 'Prima', 'Retención', 'Total', 'ID Empleado', 'Nombre', 'Apellido'])
         if liquidaciones:
             for liq in liquidaciones:
                 writer.writerow(liq)
 
-        output.seek(0)
-        response = make_response(output.getvalue())
-        response.headers['Content-Type'] = 'text/csv'
+        response = make_response(output.getvalue().encode('utf-8-sig'))
+        response.headers['Content-Type'] = 'text/csv; charset=utf-8'
         response.headers['Content-Disposition'] = 'attachment; filename=reporte_liquidaciones_' + datetime.now().strftime("%Y%m%d_%H%M%S") + '.csv'
         return response
 

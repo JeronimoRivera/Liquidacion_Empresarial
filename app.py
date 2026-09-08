@@ -7,4 +7,4 @@ from controller.controlador import BaseDeDatos
 if __name__ == "__main__":
     bd = BaseDeDatos()
     bd.crear_tabla()
-    Run.app.run(host="127.0.0.1", port=8080, debug=True)
+    Run.app.run(host="127.0.0.1", port=8080, debug=True, use_reloader=False)
