@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}Análisis Inteligente de Costos Laborales{% endblock %}
+
+{% block content %}
+<style>
+    .alerta-critico { border-left: 5px solid #dc3545; background-color: #f8d7da; }
+    .alerta-alto { border-left: 5px solid #fd7e14; background-color: #fff3cd; }
+    .alerta-medio { border-left: 5px solid #ffc107; background-color: #fff3cd; }
+    .alerta-bajo { border-left: 5px solid #17a2b8; background-color: #d1ecf1; }
+    .badge-optimo { background-color: #28a745; }
+    .badge-bajo { background-color: #17a2b8; }
+    .badge-alto { background-color: #fd7e14; }
+    .metric-card { border-radius: 8px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 15px; }
+    .metric-value { font-size: 28px; font-weight: bold; }
+    .metric-label { font-size: 12px; text-transform: uppercase; opacity: 0.9; }
+</style>
+
+<div class="mb-3">
+    <a href="{{ url_for('index') }}" class="btn btn-back">Volver al inicio</a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4>🔍 Análisis Inteligente de Costos Laborales</h4>
+        <p class="mb-0">Análisis predictivo, alertas y recomendaciones - Sin acceso a base de datos</p>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% include "_csrf_field.html" %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="salario_basico" class="form-label">Salario básico</label>
+                    <input class="form-control" type="number" min="1" step="0.01" id="salario_basico" name="salario_basico" value="{{ datos.get('salario_basico', '') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="dias_acumulados_vacaciones" class="form-label">Días acumulados de vacaciones</label>
+                    <input class="form-control" type="number" min="0" id="dias_acumulados_vacaciones" name="dias_acumulados_vacaciones" value="{{ datos.get('dias_acumulados_vacaciones', '0') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="fecha_inicio_labores" class="form-label">Inicio de labores</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_inicio_labores" name="fecha_inicio_labores" value="{{ datos.get('fecha_inicio_labores', '') }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="fecha_salida" class="form-label">Fecha de salida</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_salida" name="fecha_salida" value="{{ datos.get('fecha_salida', '') }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary w-100" type="submit">
+                        <i class="bi bi-graph-up"></i> Generar Análisis Inteligente
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if analisis %}
+<!-- RESUMEN DE COSTOS -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-label">Costo Total</div>
+            <div class="metric-value">${{ '{:,.0f}'.format(analisis.costo_total) }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-label">Costo Diario</div>
+            <div class="metric-value">${{ '{:,.0f}'.format(analisis.costo_medio_diario) }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-label">Días Trabajados</div>
+            <div class="metric-value">{{ (analisis.metricas_eficiencia.get('dias_equivalentes_salario', 0) / 30) | round(1) }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-label">Múltiplo de Salario</div>
+            <div class="metric-value">{{ analisis.metricas_eficiencia.get('costo_como_multiplo_salario', 0) | round(2) }}x</div>
+        </div>
+    </div>
+</div>
+
+<!-- ALERTAS Y RECOMENDACIONES -->
+{% if analisis.alertas %}
+<div class="card mt-4">
+    <div class="card-header bg-warning text-dark">
+        <h5>⚠️ Alertas Detectadas ({{ analisis.alertas | length }})</h5>
+    </div>
+    <div class="card-body">
+        {% for alerta in analisis.alertas %}
+        <div class="alert alerta-{{ alerta.nivel.value }} mb-3">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="mb-2">
+                        <span class="badge" 
+                              style="background-color: {% if alerta.nivel.value == 'crítico' %}#dc3545{% elif alerta.nivel.value == 'alto' %}#fd7e14{% elif alerta.nivel.value == 'medio' %}#ffc107{% else %}#17a2b8{% endif %}">
+                            {{ alerta.nivel.value | upper }}
+                        </span>
+                        {{ alerta.titulo }}
+                    </h6>
+                    <p class="mb-2">{{ alerta.descripcion }}</p>
+                    <small><strong>💡 Recomendación:</strong> {{ alerta.recomendacion }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="alert alert-success mt-4">
+    <h5>✅ Sin Alertas Críticas</h5>
+    <p class="mb-0">El análisis de costos se encuentra dentro de los parámetros normales.</p>
+</div>
+{% endif %}
+
+<!-- RECOMENDACIONES -->
+{% if analisis.recomendaciones %}
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h5>📋 Recomendaciones</h5>
+    </div>
+    <div class="card-body">
+        <ul class="list-group list-group-flush">
+            {% for recomendacion in analisis.recomendaciones %}
+            <li class="list-group-item">{{ recomendacion }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+<!-- COMPOSICIÓN DE COSTOS -->
+<div class="card mt-4">
+    <div class="card-header bg-success text-white">
+        <h5>📊 Composición de Costos</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Porcentaje del Total</th>
+                    <th>Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set componentes = [
+                    ('indemnizacion', 'Indemnización'),
+                    ('vacaciones', 'Vacaciones'),
+                    ('cesantias', 'Cesantías'),
+                    ('intereses_cesantias', 'Intereses sobre Cesantías'),
+                    ('primas', 'Primas de Servicios'),
+                    ('retencion_fuente', 'Retención en la Fuente')
+                ] %}
+                {% for key, label in componentes %}
+                    {% if analisis.composicion_costos.get(key, 0) > 0 %}
+                    <tr>
+                        <td>{{ label }}</td>
+                        <td>
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar" style="width: {{ analisis.composicion_costos.get(key, 0) }}%;">
+                                    {{ analisis.composicion_costos.get(key, 0) | round(1) }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>${{ '{:,.0f}'.format(analisis.costo_total * analisis.composicion_costos.get(key, 0) / 100) }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+                <tr class="table-active fw-bold">
+                    <td>TOTAL A PAGAR</td>
+                    <td>100%</td>
+                    <td>${{ '{:,.0f}'.format(analisis.costo_total) }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ANÁLISIS COMPARATIVO CON RANGOS ÓPTIMOS -->
+<div class="card mt-4">
+    <div class="card-header bg-secondary text-white">
+        <h5>📈 Análisis Comparativo (vs. Rangos Óptimos)</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Valor Actual</th>
+                    <th>Rango Óptimo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set conceptos = [('indemnizacion', 'Indemnización'), ('vacaciones', 'Vacaciones'), ('cesantias', 'Cesantías'), ('primas', 'Primas')] %}
+                {% for key, label in conceptos %}
+                    {% set comp = analisis.comparativa.get(key, {}) %}
+                    <tr>
+                        <td>{{ label }}</td>
+                        <td>{{ comp.get('actual', 0) | round(1) }}%</td>
+                        <td>{{ comp.get('optimo_min', 0) | round(1) }}% - {{ comp.get('optimo_max', 0) | round(1) }}%</td>
+                        <td>
+                            <span class="badge badge-{{ comp.get('estado', 'normal') }}">
+                                {{ comp.get('estado', 'Normal') | upper }}
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MÉTRICAS DE EFICIENCIA -->
+<div class="card mt-4">
+    <div class="card-header bg-dark text-white">
+        <h5>⚙️ Métricas de Eficiencia</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Métrica</th>
+                    <th>Valor</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Costo Total del Trabajador</td>
+                    <td>${{ '{:,.0f}'.format(analisis.metricas_eficiencia.get('costo_total_trabajador', 0)) }}</td>
+                    <td>Suma total a pagar incluyendo todos los beneficios</td>
+                </tr>
+                <tr>
+                    <td>Costo por Día Trabajado</td>
+                    <td>${{ '{:,.0f}'.format(analisis.metricas_eficiencia.get('costo_por_dia_trabajado', 0)) }}</td>
+                    <td>Promedio de costo diario durante la relación laboral</td>
+                </tr>
+                <tr>
+                    <td>Costo como Múltiplo de Salario</td>
+                    <td>{{ analisis.metricas_eficiencia.get('costo_como_multiplo_salario', 0) | round(2) }}x</td>
+                    <td>Cuántos meses de salario representa el costo total</td>
+                </tr>
+                <tr>
+                    <td>Días Equivalentes (en salarios)</td>
+                    <td>{{ analisis.metricas_eficiencia.get('dias_equivalentes_salario', 0) | round(1) }}</td>
+                    <td>Cantidad de días de salario que equivale al pago</td>
+                </tr>
+                <tr>
+                    <td>Ratio Indemnización/Salario</td>
+                    <td>{{ analisis.metricas_eficiencia.get('ratio_indemnizacion_salario', 0) | round(2) }}</td>
+                    <td>Relación entre indemnización y salario mensual</td>
+                </tr>
+                <tr>
+                    <td>Ratio Vacaciones/Salario</td>
+                    <td>{{ analisis.metricas_eficiencia.get('ratio_vacaciones_salario', 0) | round(2) }}</td>
+                    <td>Relación entre vacaciones y salario mensual</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- INFORMACIÓN DEL ANÁLISIS -->
+<div class="alert alert-info mt-4">
+    <h6>ℹ️ Información del Análisis</h6>
+    <ul class="mb-0">
+        <li>Este análisis es completamente predictivo y se realiza <strong>100% en memoria</strong></li>
+        <li><strong>No accede ni modifica</strong> la base de datos en ningún momento</li>
+        <li>Los datos son procesados localmente para proporcionar recomendaciones inmediatas</li>
+        <li>Las alertas se generan automáticamente basadas en patrones y rangos óptimos</li>
+        <li>Use este análisis como herramienta de apoyo en la toma de decisiones</li>
+    </ul>
+</div>
+
+{% endif %}
+{% endblock %}

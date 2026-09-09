@@ -16,6 +16,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from controller.controlador import BaseDeDatos
 from model.calculadora import CalculadoraLiquidacion
+from model.mapa_liquidacion import MapaLiquidacion
 
 # Funciones auxiliares de consola usadas en las vistas
 from view.console.consolacontrolador import (
@@ -280,6 +281,28 @@ def proyeccion_liquidacion():
         except (KeyError, TypeError, ValueError) as error:
             flash(f"No fue posible calcular la proyección: {error}", "error")
     return render_template('proyeccion_liquidacion.html', comparacion=comparacion, datos=datos)
+
+
+@app.route('/mapa_liquidacion', methods=['GET', 'POST'])
+@login_required
+def mapa_liquidacion():
+    """Desglosa una liquidación en memoria sin acceder a persistencia."""
+    resultado = None
+    datos = {}
+    
+    if request.method == 'POST':
+        datos = request.form.to_dict()
+        try:
+            resultado = MapaLiquidacion().generar(
+                salario_basico=float(request.form['salario_basico']),
+                fecha_inicio_labores=request.form['fecha_inicio_labores'],
+                fecha_salida=request.form['fecha_salida'],
+                dias_acumulados_vacaciones=int(request.form['dias_acumulados_vacaciones']),
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            flash(f"No fue posible analizar la liquidación: {error}", "error")
+
+    return render_template('mapa_liquidacion.html', resultado=resultado, datos=datos)
 
 
 @app.route('/consultar_usuario', methods=['GET', 'POST'])
