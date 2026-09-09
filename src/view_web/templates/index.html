@@ -86,6 +86,15 @@
                 </a>
             </div>
 
+            <!-- Asistente IA -->
+            <div class="function-card">
+                <h3>Asistente IA Gemini</h3>
+                <p>Consulta rápida al modelo gratuito de Google Gemini para dudas operativas o explicaciones puntuales.</p>
+                <a href="{{ url_for('asistente_ia') }}" class="btn btn-secondary">
+                    Abrir Asistente
+                </a>
+            </div>
+
             <!-- Funciones Administrativas (Solo Administrador) -->
             {% if session.get('rol') == 'administrador' %}
             <div class="function-card">

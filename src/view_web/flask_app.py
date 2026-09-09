@@ -16,6 +16,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from controller.controlador import BaseDeDatos
 
+try:
+    import requests
+except Exception:
+    requests = None
+
 # Funciones auxiliares de consola usadas en las vistas
 from view.console.consolacontrolador import (
     asignar_id_liquidacion,
@@ -28,7 +33,7 @@ from view.console.consolacontrolador import (
     dias_trabajados,
 )
 
-from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response
+from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response, jsonify
 
 # CSRF opcional: usa Flask-WTF si está instalado; si no, crea un stub que desactiva CSRF.
 HAS_FLASK_WTF = True
@@ -367,6 +372,63 @@ def admin_usuarios():
     except Exception as e:
         flash(f"Error al cargar usuarios: {str(e)}", "error")
         return redirect(url_for('admin_panel'))
+
+
+@app.route('/asistente_ia', methods=['GET', 'POST'])
+@login_required
+def asistente_ia():
+    """Asistente IA local usando Ollama."""
+    consulta = ''
+    respuesta_ia = None
+    error_ia = None
+
+    if request.method == 'POST':
+        consulta = (request.form.get('consulta') or '').strip()
+
+        if not consulta:
+            flash('Debes escribir una consulta antes de consultar al asistente.', 'error')
+            return render_template('asistente_ia.html', consulta='', respuesta_ia=None, error_ia=None)
+
+        if requests is None:
+            error_ia = 'La librería requests no está instalada. Ejecuta: pip install requests'
+            return render_template('asistente_ia.html', consulta=consulta, respuesta_ia=None, error_ia=error_ia)
+
+        contexto_sistema = (
+            "Eres el Asistente virtual del 'Sistema de Liquidación Definitiva Empresarial' en Colombia. "
+            "Este sistema permite gestionar empleados, calcular liquidaciones laborales (cesantías, intereses de cesantías, "
+            "prima de servicios y vacaciones) y generar reportes. Responde de forma clara, concisa y profesional a las dudas "
+            "del usuario sobre el sistema y legislación laboral colombiana."
+        )
+
+        pregunta_usuario = consulta
+        prompt_final = f"{contexto_sistema}\n\nPregunta: {pregunta_usuario}"
+
+        try:
+            response = requests.post(
+                'http://127.0.0.1:11434/api/generate',
+                json={
+                    'model': 'qwen2.5:0.5b',
+                    'prompt': prompt_final,
+                    'stream': False
+                },
+                timeout=60
+            )
+
+            if response.status_code == 200:
+                payload = response.json()
+                respuesta_ia = payload.get('response', '').strip()
+                if not respuesta_ia:
+                    error_ia = 'Ollama respondió vacío. Intenta nuevamente o verifica que el modelo esté disponible.'
+            else:
+                error_ia = f'Ollama devolvió un error HTTP {response.status_code}. Verifica que el servicio local esté activo.'
+
+        except requests.exceptions.ConnectionError:
+            error_ia = 'El servicio local de Ollama no está activo. Inicia Ollama en tu equipo antes de realizar la consulta.'
+        except Exception as e:
+            print(f"[OLLAMA DEBUG ERROR] {type(e).__name__}: {e}")
+            error_ia = 'No se pudo consultar Ollama. Revisa la terminal para ver el detalle exacto del error.'
+
+    return render_template('asistente_ia.html', consulta=consulta, respuesta_ia=respuesta_ia, error_ia=error_ia)
 
 
 @app.route('/simple')

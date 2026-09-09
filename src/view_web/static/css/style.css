@@ -295,6 +295,38 @@ body {
     box-shadow: 0 0 0 3px var(--shadow-color);
 }
 
+.assistant-shell {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.assistant-description {
+    color: var(--text-medium);
+    margin-bottom: 1.5rem;
+}
+
+.assistant-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.assistant-response {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--border-gray);
+    border-radius: 2px;
+    background: var(--surface-inset);
+    color: var(--text-dark);
+    min-height: 120px;
+    white-space: pre-wrap;
+}
+
+.assistant-response.is-error {
+    border-color: var(--error-red);
+    color: var(--error-red);
+}
+
 .theme-toggle {
     display: inline-flex;
     align-items: center;

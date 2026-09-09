@@ -27,6 +27,9 @@ MANIFEST
 # VS Code
 .vscode/
 
+# Local environment secrets
+.env
+
 # Virtual Environment
 venv/
 env/

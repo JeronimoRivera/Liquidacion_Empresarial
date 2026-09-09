@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Asistente IA (Local){% endblock %}
+
+{% block content %}
+<div class="container assistant-shell">
+    <div class="card">
+        <div class="card-header">
+            <h2>Asistente IA (Local)</h2>
+        </div>
+
+        <p class="assistant-description">
+            Puedes realizar cualquier consulta relacionada con el funcionamiento del sistema, cálculo de liquidaciones, gestión de empleados o sobre el proyecto en general.
+        </p>
+
+        <form method="post" action="{{ url_for('asistente_ia') }}" class="assistant-form">
+            <div class="form-group">
+                <label for="consulta" class="form-label">Tu consulta</label>
+                <textarea
+                    id="consulta"
+                    name="consulta"
+                    class="form-control"
+                    rows="5"
+                    placeholder="Ejemplo: Explica cómo se calcula la prima de servicios en este sistema"
+                >{{ consulta or '' }}</textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <button type="submit" class="btn btn-primary">Consultar al asistente</button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Volver al inicio</a>
+            </div>
+        </form>
+
+        {% if respuesta_ia is not none or error_ia %}
+        <div class="assistant-response{% if error_ia %} is-error{% endif %}">
+            {% if error_ia %}
+                {{ error_ia }}
+            {% else %}
+                {{ respuesta_ia }}
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
