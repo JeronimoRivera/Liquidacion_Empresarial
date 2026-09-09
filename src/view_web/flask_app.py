@@ -283,7 +283,6 @@ def proyeccion_liquidacion():
     return render_template('proyeccion_liquidacion.html', comparacion=comparacion, datos=datos)
 
 
-<<<<<<< HEAD
 @app.route('/mapa_liquidacion', methods=['GET', 'POST'])
 @login_required
 def mapa_liquidacion():
@@ -304,7 +303,6 @@ def mapa_liquidacion():
             flash(f"No fue posible analizar la liquidación: {error}", "error")
 
     return render_template('mapa_liquidacion.html', resultado=resultado, datos=datos)
-=======
 @app.route('/asistente_decisiones', methods=['GET', 'POST'])
 @login_required
 def asistente_decisiones():
@@ -339,7 +337,6 @@ def asistente_decisiones():
         except (KeyError, TypeError, ValueError) as error:
             flash(f"No fue posible generar la recomendación: {error}", "error")
     return render_template('asistente_decisiones.html', resultado=resultado, datos=datos)
->>>>>>> ffa2465d763ff8c8efc6571546d240900d4a54d3
 
 
 @app.route('/consultar_usuario', methods=['GET', 'POST'])
