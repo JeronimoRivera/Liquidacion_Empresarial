@@ -1,4 +1,7 @@
-import os, sys, types
+import os
+import sys
+import types
+
 import pytest
 
 # Asegura que <repo>/src esté en sys.path aunque se ejecute este archivo directamente
@@ -59,6 +62,17 @@ class DummyBD:
         return [(1001, 1,1,1,1,1,0.1,4.1,1, "Admin", "Sistema")]
     def obtener_estadisticas(self):
         return {"total_usuarios": 1, "total_liquidaciones": 1, "promedio_salario": 5000000.0, "total_pagado": 4.1}
+
+    def obtener_empleados_con_liquidacion_pendiente(self):
+        return [
+            {
+                "id": 7,
+                "nombre": "Pedro",
+                "apellido": "Pérez",
+                "fecha_salida": "2024-08-15",
+                "salario": 3200000,
+            }
+        ]
 
 
 @pytest.fixture(autouse=True)
@@ -181,6 +195,44 @@ def test_admin_panel_success(client, monkeypatch):
     resp = client.get("/admin_panel")
     assert resp.status_code == 200
     assert "admin_panel.html" in resp.get_data(as_text=True)
+
+
+def test_admin_panel_muestra_liquidaciones_pendientes(client, monkeypatch):
+    login_ok(client, monkeypatch)
+    with client.session_transaction() as sess:
+        sess["rol"] = "administrador"
+
+    pending = [{
+        "id": 7,
+        "nombre": "Pedro",
+        "apellido": "Pérez",
+        "fecha_salida": "2024-08-15",
+        "salario": 3200000,
+    }]
+
+    class PendingBD(DummyBD):
+        def obtener_todos_usuarios(self):
+            return []
+
+        def obtener_todas_liquidaciones(self):
+            return []
+
+        def obtener_estadisticas(self):
+            return {"total_usuarios": 1, "total_liquidaciones": 0, "promedio_salario": 0.0, "total_pagado": 0.0}
+
+        def obtener_empleados_con_liquidacion_pendiente(self):
+            return pending
+
+    monkeypatch.setattr(flask_app, "BaseDeDatos", lambda: PendingBD(), raising=True)
+
+    def fake_render(template_name, **context):
+        assert context["empleados_pendientes"] == pending
+        return "PENDIENTES OK"
+
+    monkeypatch.setattr(flask_app, "render_template", fake_render, raising=True)
+    resp = client.get("/admin_panel")
+    assert resp.status_code == 200
+    assert resp.get_data(as_text=True) == "PENDIENTES OK"
 
 
 def test_exportar_datos_csv(client, monkeypatch):
