@@ -67,6 +67,113 @@ class CalculadoraLiquidacion:
             round(total_pagar, 2),
         )
 
+    def calcular_escenario(
+        self,
+        salario_basico: float,
+        fecha_inicio_labores: str,
+        fecha_salida: str,
+        dias_acumulados_vacaciones: int,
+    ) -> dict[str, float]:
+        """Convierte una liquidación en un resumen reutilizable para simulaciones."""
+        resultados = self.calcular_resultados_prueba(
+            salario_basico,
+            fecha_inicio_labores,
+            fecha_salida,
+            dias_acumulados_vacaciones,
+        )
+        nombres = (
+            "indemnizacion",
+            "vacaciones",
+            "cesantias",
+            "intereses_cesantias",
+            "primas",
+            "retencion_fuente",
+            "total_pagar",
+        )
+        return dict(zip(nombres, resultados))
+
+    def comparar_escenarios(
+        self,
+        salario_basico: float,
+        fecha_inicio_labores: str,
+        fecha_salida_actual: str,
+        fecha_salida_proyectada: str,
+        dias_acumulados_vacaciones: int,
+    ) -> dict[str, object]:
+        """Compara la liquidación de hoy con una fecha de salida futura."""
+        actual = self.calcular_escenario(
+            salario_basico,
+            fecha_inicio_labores,
+            fecha_salida_actual,
+            dias_acumulados_vacaciones,
+        )
+        proyectado = self.calcular_escenario(
+            salario_basico,
+            fecha_inicio_labores,
+            fecha_salida_proyectada,
+            dias_acumulados_vacaciones,
+        )
+        diferencias = {
+            clave: round(proyectado[clave] - actual[clave], 2)
+            for clave in actual
+        }
+        dias_adicionales = (
+            datetime.strptime(fecha_salida_proyectada, DATE_FORMAT_UI)
+            - datetime.strptime(fecha_salida_actual, DATE_FORMAT_UI)
+        ).days
+        return {
+            "actual": actual,
+            "proyectado": proyectado,
+            "diferencias": diferencias,
+            "dias_adicionales": dias_adicionales,
+        }
+
+    def simular_escenarios_decision(
+        self,
+        salario_basico: float,
+        fecha_inicio_labores: str,
+        fecha_salida_actual: str,
+        fechas_propuestas: list[str],
+        dias_acumulados_vacaciones: int,
+    ) -> dict[str, object]:
+        """Genera un comparativo de varios escenarios de salida para tomar decisiones de RRHH."""
+        base = self.calcular_escenario(
+            salario_basico,
+            fecha_inicio_labores,
+            fecha_salida_actual,
+            dias_acumulados_vacaciones,
+        )
+
+        escenarios = []
+        for fecha in fechas_propuestas:
+            comparacion = self.comparar_escenarios(
+                salario_basico=salario_basico,
+                fecha_inicio_labores=fecha_inicio_labores,
+                fecha_salida_actual=fecha_salida_actual,
+                fecha_salida_proyectada=fecha,
+                dias_acumulados_vacaciones=dias_acumulados_vacaciones,
+            )
+            incremento = round(comparacion["diferencias"]["total_pagar"], 2)
+            escenarios.append({
+                "fecha": fecha,
+                "dias_extra": comparacion["dias_adicionales"],
+                "total_actual": round(comparacion["actual"]["total_pagar"], 2),
+                "total_proyectado": round(comparacion["proyectado"]["total_pagar"], 2),
+                "incremento_total": incremento,
+                "riesgo": "favorables" if incremento > 0 else "sin beneficio",
+            })
+
+        mejor = max(escenarios, key=lambda item: item["incremento_total"], default=None)
+        return {
+            "base": base,
+            "escenarios": escenarios,
+            "mejor": mejor,
+            "mensaje": (
+                f"El escenario más favorable es {mejor['fecha']} con un incremento estimado de ${mejor['incremento_total']:.2f}."
+                if mejor else "No fue posible calcular un escenario ganador."
+            ),
+        }
+
     def calcular_indemnizacion(self, salario_mensual: float, tiempo_trabajado_anos: float) -> float:
         """
         Calcula la indemnización:

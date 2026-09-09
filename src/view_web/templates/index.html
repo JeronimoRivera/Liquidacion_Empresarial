@@ -95,6 +95,14 @@
                 </a>
             </div>
 
+            <div class="function-card" style="border: 2px solid var(--success-green);">
+                <h3>Proyección inteligente</h3>
+                <p>Compare dos fechas de salida y descubra cuánto cambia cada concepto de su liquidación</p>
+                <a href="{{ url_for('proyeccion_liquidacion') }}" class="btn btn-primary">
+                    Simular escenarios
+                </a>
+            </div>
+
             <!-- Funciones Administrativas (Solo Administrador) -->
             {% if session.get('rol') == 'administrador' %}
             <div class="function-card">
