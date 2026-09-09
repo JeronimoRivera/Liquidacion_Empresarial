@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Asistente de decisiones{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('index') }}" class="btn btn-back">Volver al inicio</a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h4>Asistente de decisiones de liquidación</h4>
+        <p class="mb-0">Ingresa los datos básicos y te dirá si conviene salir hoy o esperar otra fecha.</p>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% include "_csrf_field.html" %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="salario_basico" class="form-label">Salario básico</label>
+                    <input class="form-control" type="number" min="1" step="0.01" id="salario_basico" name="salario_basico" value="{{ datos.get('salario_basico', '') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="dias_acumulados_vacaciones" class="form-label">Días de vacaciones</label>
+                    <input class="form-control" type="number" min="0" id="dias_acumulados_vacaciones" name="dias_acumulados_vacaciones" value="{{ datos.get('dias_acumulados_vacaciones', '0') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="fecha_inicio_labores" class="form-label">Inicio de labores</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_inicio_labores" name="fecha_inicio_labores" value="{{ datos.get('fecha_inicio_labores', '') }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="fecha_salida_actual" class="form-label">Salida actual</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_salida_actual" name="fecha_salida_actual" value="{{ datos.get('fecha_salida_actual', '') }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="fecha_salida_proyectada" class="form-label">Fecha propuesta</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_salida_proyectada" name="fecha_salida_proyectada" value="{{ datos.get('fecha_salida_proyectada', '') }}" required>
+                </div>
+            </div>
+            <button class="btn btn-success mt-4" type="submit">Obtener recomendación</button>
+        </form>
+    </div>
+</div>
+
+{% if resultado %}
+<div class="card mt-4">
+    <div class="card-header bg-success text-white">
+        <h4>Recomendación final</h4>
+    </div>
+    <div class="card-body">
+        <div class="alert {% if resultado.diferencia_total >= 0 %}alert-success{% else %}alert-warning{% endif %}">
+            {{ resultado.mensaje }}
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <strong>Valor hoy:</strong><br>
+                ${{ '{:,.2f}'.format(resultado.comparacion.actual.total_pagar) }}
+            </div>
+            <div class="col-md-4">
+                <strong>Valor propuesto:</strong><br>
+                ${{ '{:,.2f}'.format(resultado.comparacion.proyectado.total_pagar) }}
+            </div>
+            <div class="col-md-4">
+                <strong>Diferencia:</strong><br>
+                <span class="{{ 'text-success' if resultado.diferencia_total >= 0 else 'text-danger' }}">
+                    ${{ '{:,.2f}'.format(resultado.diferencia_total) }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

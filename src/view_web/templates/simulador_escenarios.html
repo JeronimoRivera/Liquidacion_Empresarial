@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Simulador de decisiones{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('index') }}" class="btn btn-back">Volver al inicio</a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4>Simulador de escenarios de salida</h4>
+        <p class="mb-0">Comparte varias fechas posibles para decidir cuál opción maximiza el valor final.</p>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% include "_csrf_field.html" %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="salario_basico" class="form-label">Salario básico</label>
+                    <input class="form-control" type="number" min="1" step="0.01" id="salario_basico" name="salario_basico" value="{{ datos.get('salario_basico', '') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="dias_acumulados_vacaciones" class="form-label">Días de vacaciones acumulados</label>
+                    <input class="form-control" type="number" min="0" id="dias_acumulados_vacaciones" name="dias_acumulados_vacaciones" value="{{ datos.get('dias_acumulados_vacaciones', '0') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="fecha_inicio_labores" class="form-label">Inicio de labores</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_inicio_labores" name="fecha_inicio_labores" value="{{ datos.get('fecha_inicio_labores', '') }}" required>
+                </div>
+                <div class="col-md-12">
+                    <label for="fecha_salida_actual" class="form-label">Fecha de salida actual</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_salida_actual" name="fecha_salida_actual" value="{{ datos.get('fecha_salida_actual', '') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="fecha_1" class="form-label">Escenario 1</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_1" name="fecha_1" value="{{ datos.get('fecha_1', '') }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="fecha_2" class="form-label">Escenario 2</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_2" name="fecha_2" value="{{ datos.get('fecha_2', '') }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="fecha_3" class="form-label">Escenario 3</label>
+                    <input class="form-control" type="text" placeholder="dd/mm/yyyy" id="fecha_3" name="fecha_3" value="{{ datos.get('fecha_3', '') }}">
+                </div>
+            </div>
+            <button class="btn btn-success mt-4" type="submit">Comparar escenarios</button>
+        </form>
+    </div>
+</div>
+
+{% if saldo %}
+<div class="card mt-4">
+    <div class="card-header bg-success text-white">
+        <h4>Resultado del análisis</h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            {{ saldo.mensaje }}
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <strong>Base actual:</strong><br>
+                ${{ '{:,.2f}'.format(saldo.base['total_pagar']) }}
+            </div>
+            <div class="col-md-4">
+                <strong>Mejor escenario:</strong><br>
+                {{ saldo.mejor.fecha if saldo.mejor else 'N/A' }}
+            </div>
+            <div class="col-md-4">
+                <strong>Incremento estimado:</strong><br>
+                {% if saldo.mejor %}
+                ${{ '{:,.2f}'.format(saldo.mejor.incremento_total) }}
+                {% else %}
+                $0.00
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Días extra</th>
+                        <th>Total actual</th>
+                        <th>Total proyectado</th>
+                        <th>Incremento</th>
+                        <th>Riesgo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for escenario in saldo.escenarios %}
+                    <tr>
+                        <td>{{ escenario.fecha }}</td>
+                        <td>{{ escenario.dias_extra }}</td>
+                        <td>${{ '{:,.2f}'.format(escenario.total_actual) }}</td>
+                        <td>${{ '{:,.2f}'.format(escenario.total_proyectado) }}</td>
+                        <td class="{{ 'text-success' if escenario.incremento_total >= 0 else 'text-danger' }}">
+                            ${{ '{:,.2f}'.format(escenario.incremento_total) }}
+                        </td>
+                        <td>{{ escenario.riesgo }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
