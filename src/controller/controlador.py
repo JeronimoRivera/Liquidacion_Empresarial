@@ -1,10 +1,12 @@
-import sys
-import os
-import logging
-from typing import Any, Dict, List, Optional, Tuple
-import psycopg2
-import SecretConfig
 import json
+import logging
+import os
+import sys
+from typing import Any, Dict, List, Optional, Tuple
+
+import psycopg2
+
+import SecretConfig
 
 # Asegura import relativo a la raíz del repo (conservado)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -536,6 +538,94 @@ class BaseDeDatos:
                 'promedio_salario': 0,
                 'total_pagado': 0
             }
+        finally:
+            _safe_close_conn(conn)
+
+    def obtener_empleados_con_liquidacion_pendiente(self, limite=10):
+        """Devuelve empleados con fecha de salida registrada y sin liquidación asociada."""
+        conn = self.conectar_db()
+        if not conn:
+            return []
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT u.ID_Usuario, u.Nombre, u.Apellido, u.Fecha_Salida, u.Salario
+                    FROM usuarios u
+                    LEFT JOIN liquidacion l ON l.ID_Usuario = u.ID_Usuario
+                    WHERE u.Fecha_Salida IS NOT NULL
+                      AND l.ID_Liquidacion IS NULL
+                    ORDER BY u.Fecha_Salida DESC
+                    LIMIT %s
+                    """,
+                    (limite,)
+                )
+                filas = cur.fetchall()
+                return [
+                    {
+                        'id': fila[0],
+                        'nombre': fila[1],
+                        'apellido': fila[2],
+                        'fecha_salida': fila[3],
+                        'salario': float(fila[4]) if fila[4] is not None else 0.0,
+                    }
+                    for fila in filas
+                ]
+        except psycopg2.Error as error:
+            print(f"Error al obtener empleados con liquidación pendiente: {error}")
+            logger.error("Error al obtener empleados con liquidación pendiente: %s", error)
+            return []
+        finally:
+            _safe_close_conn(conn)
+
+    def obtener_resumen_financiero_mensual(self, meses=6):
+        """Obtiene el resumen mensual usando la fecha de auditoría de creación."""
+        conn = self.conectar_db()
+        if not conn:
+            return []
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    WITH periodos AS (
+                        SELECT date_trunc('month', CURRENT_DATE) - (serie * INTERVAL '1 month') AS periodo
+                        FROM generate_series(0, %s - 1) AS serie
+                    ), resumen AS (
+                        SELECT date_trunc('month', a.Fecha_Hora) AS periodo,
+                               COUNT(DISTINCT l.ID_Liquidacion) AS cantidad,
+                               COALESCE(SUM(l.Total_A_Pagar), 0) AS total_pagado,
+                               COALESCE(SUM(l.Retencion_Fuente), 0) AS total_retenciones
+                        FROM auditoria a
+                        JOIN liquidacion l ON l.ID_Liquidacion = a.ID_Registro
+                        WHERE a.Accion = 'CREATE'
+                          AND a.Tabla_Afectada = 'liquidacion'
+                          AND a.Fecha_Hora >= date_trunc('month', CURRENT_DATE) - (%s * INTERVAL '1 month')
+                        GROUP BY date_trunc('month', a.Fecha_Hora)
+                    )
+                    SELECT TO_CHAR(periodos.periodo, 'YYYY-MM') AS mes,
+                           COALESCE(resumen.cantidad, 0),
+                           COALESCE(resumen.total_pagado, 0),
+                           COALESCE(resumen.total_retenciones, 0)
+                    FROM periodos
+                    LEFT JOIN resumen ON resumen.periodo = periodos.periodo
+                    ORDER BY periodos.periodo DESC
+                    """,
+                    (meses, meses),
+                )
+                filas = cur.fetchall()
+                return [
+                    {
+                        'mes': fila[0],
+                        'cantidad': int(fila[1]),
+                        'total_pagado': float(fila[2]),
+                        'total_retenciones': float(fila[3]),
+                        'promedio': float(fila[2]) / int(fila[1]) if fila[1] else 0.0,
+                    }
+                    for fila in filas
+                ]
+        except psycopg2.Error as error:
+            logger.error("Error al obtener resumen financiero mensual: %s", error)
+            return []
         finally:
             _safe_close_conn(conn)
 
