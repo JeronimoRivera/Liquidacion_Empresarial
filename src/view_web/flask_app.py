@@ -289,7 +289,6 @@ def mapa_liquidacion():
     """Desglosa una liquidación en memoria sin acceder a persistencia."""
     resultado = None
     datos = {}
-    
     if request.method == 'POST':
         datos = request.form.to_dict()
         try:
@@ -301,8 +300,9 @@ def mapa_liquidacion():
             )
         except (KeyError, TypeError, ValueError) as error:
             flash(f"No fue posible analizar la liquidación: {error}", "error")
-
     return render_template('mapa_liquidacion.html', resultado=resultado, datos=datos)
+
+
 @app.route('/asistente_decisiones', methods=['GET', 'POST'])
 @login_required
 def asistente_decisiones():
