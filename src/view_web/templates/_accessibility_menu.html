@@ -1,0 +1,90 @@
+<a class="a11y-skip-link" href="#main-content">Saltar al contenido principal</a>
+<section class="a11y-widget" aria-label="Opciones de accesibilidad">
+    <button type="button" class="a11y-trigger" id="a11y-trigger" aria-expanded="false" aria-controls="a11y-panel">
+        <i class="fas fa-universal-access" aria-hidden="true"></i>
+        <span>Accesibilidad</span>
+    </button>
+    <div class="a11y-panel" id="a11y-panel" hidden>
+        <div class="a11y-panel-header">
+            <div>
+                <p class="a11y-kicker">Personaliza tu experiencia</p>
+                <h2 id="a11y-title">Opciones de accesibilidad</h2>
+            </div>
+            <button type="button" class="a11y-close" id="a11y-close" aria-label="Cerrar opciones de accesibilidad">&times;</button>
+        </div>
+        <div class="a11y-controls" aria-labelledby="a11y-title">
+            <fieldset class="a11y-control-group">
+                <legend class="a11y-label" id="a11y-text-size-label">Tamaño del texto</legend>
+                <div class="a11y-button-row" aria-labelledby="a11y-text-size-label">
+                    <button type="button" class="a11y-option" data-a11y-action="font-small" aria-pressed="false">A pequeña</button>
+                    <button type="button" class="a11y-option" data-a11y-action="font-normal" aria-pressed="true">A normal</button>
+                    <button type="button" class="a11y-option" data-a11y-action="font-large" aria-pressed="false">A grande</button>
+                </div>
+            </fieldset>
+            <fieldset class="a11y-control-group">
+                <legend class="a11y-label">Lectura y navegación</legend>
+                <div class="a11y-action-row">
+                    <button type="button" class="a11y-action" data-a11y-action="read"><i class="fas fa-volume-up" aria-hidden="true"></i> Leer esta página</button>
+                    <button type="button" class="a11y-action" data-a11y-action="stop"><i class="fas fa-stop" aria-hidden="true"></i> Detener lectura</button>
+                </div>
+            </fieldset>
+            <fieldset class="a11y-toggle-list">
+                <legend class="a11y-label">Visual y navegación</legend>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="contrast">
+                    <span>Alto contraste</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="dyslexia">
+                    <span>Lectura amigable para dislexia</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="spacing">
+                    <span>Más espacio entre líneas</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="links">
+                    <span>Subrayar enlaces</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="motion">
+                    <span>Reducir movimiento</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="focus">
+                    <span>Resaltar el foco del teclado</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="targets">
+                    <span>Botones y campos más grandes</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="guide">
+                    <span>Guía de lectura</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="monochrome">
+                    <span>Reducir dependencia del color</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="reading">
+                    <span>Modo de lectura simple</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="color-rg">
+                    <span>Daltonismo rojo y verde</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="color-by">
+                    <span>Daltonismo azul y amarillo</span>
+                </label>
+                <label class="a11y-switch-row">
+                    <input type="checkbox" data-a11y-toggle="cursor">
+                    <span>Cursor grande y visible</span>
+                </label>
+            </fieldset>
+            <button type="button" class="a11y-reset" data-a11y-action="reset">Restablecer opciones</button>
+            <p class="a11y-status" id="a11y-status" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+</section>

@@ -9,8 +9,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Corporativo -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/accessibility.js', v='2') }}" defer></script>
 </head>
 <body>
+    {% include "_accessibility_menu.html" %}
     <!-- Mensajes del Sistema -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -43,7 +45,7 @@
         {% endif %}
     {% endwith %}
 
-    <div class="login-container">
+    <main id="main-content" class="login-container">
         <div class="login-card">
             <!-- Header Corporativo -->
             <div class="login-header">
@@ -133,7 +135,7 @@
                 </p>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Script para mejorar la experiencia de usuario -->
     <script>

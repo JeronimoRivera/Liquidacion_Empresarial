@@ -9,8 +9,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Corporativo -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/accessibility.js', v='2') }}" defer></script>
 </head>
 <body>
+    {% include "_accessibility_menu.html" %}
     <!-- Header Corporativo -->
     <header class="main-header">
         <div class="container">
@@ -84,7 +86,7 @@
     {% endwith %}
 
     <!-- Contenido Principal -->
-    <main>
+    <main id="main-content">
         {% block content %}{% endblock %}
     </main>
 
