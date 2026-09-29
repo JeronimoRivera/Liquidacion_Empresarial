@@ -1,50 +1,88 @@
-/* SISTEMA DE LIQUIDACIÓN DEFINITIVA - TEMA RETRO */
-
+/* Tokens corporativos para la interfaz financiera. */
 :root {
-    --primary-navy: #ff1a2f;
-    --secondary-navy: #a80016;
-    --accent-blue: #ff3347;
-    --light-blue: #3a1218;
-    --dark-gray: #080808;
-    --medium-gray: #171717;
-    --light-gray: #b7b7b7;
-    --white: #f5f1ed;
-    --off-white: #0f0f0f;
-    --border-gray: #472027;
-    --success-green: #ff4052;
-    --warning-orange: #ff9f43;
-    --error-red: #ff3347;
-    --text-dark: #f5f1ed;
-    --text-medium: #d0c8c4;
-    --text-light: #9d9390;
-    --surface-raised: #171313;
-    --surface-inset: #0a0a0a;
-    --shadow-color: rgba(255, 26, 47, 0.22);
-    --grid-line: rgba(255, 26, 47, 0.07);
-    --font-retro: 'Courier New', 'Lucida Console', monospace;
+    --color-brand-primary: #0F172A;
+    --color-brand-interactive: #2563EB;
+    --color-app-background: #F8FAFC;
+    --color-surface: #FFFFFF;
+    --color-border: #E2E8F0;
+    --color-header-background: #FFFFFF;
+    --color-header-foreground: #0F172A;
+    --color-header-border: #E2E8F0;
+    --color-header-accent: #2563EB;
+    --color-success-text: #047857;
+    --color-success-background: #ECFDF5;
+    --color-pending-text: #B45309;
+    --color-pending-background: #FFFBEB;
+    --color-error-text: #B91C1C;
+    --color-error-background: #FEF2F2;
+    --color-info-text: #1D4ED8;
+    --color-info-background: #EFF6FF;
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #64748B;
+    --color-income: #0F766E;
+    --color-expense: #334155;
+
+    --primary-navy: var(--color-brand-primary);
+    --secondary-navy: var(--color-brand-primary);
+    --accent-blue: var(--color-brand-interactive);
+    --light-blue: var(--color-info-background);
+    --dark-gray: var(--color-brand-primary);
+    --medium-gray: var(--color-expense);
+    --light-gray: var(--color-text-secondary);
+    --white: var(--color-surface);
+    --off-white: var(--color-app-background);
+    --border-gray: var(--color-border);
+    --success-green: var(--color-success-text);
+    --warning-orange: var(--color-pending-text);
+    --error-red: var(--color-error-text);
+    --text-dark: var(--color-text-primary);
+    --text-medium: var(--color-text-secondary);
+    --text-light: var(--color-text-secondary);
+    --surface-raised: var(--color-surface);
+    --surface-inset: var(--color-surface);
+    --shadow-color: rgba(15, 23, 42, 0.08);
+    --grid-line: transparent;
+    --font-ui: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+    --font-retro: var(--font-ui);
 }
 
-:root[data-theme="light"] {
-    --primary-navy: #c90019;
-    --secondary-navy: #8e0013;
-    --accent-blue: #e50924;
-    --light-blue: #f8d9dc;
-    --dark-gray: #1a1a1a;
-    --medium-gray: #36302f;
-    --light-gray: #716967;
-    --white: #fffdf8;
-    --off-white: #f4f4f0;
-    --border-gray: #d5b8bb;
-    --success-green: #b00018;
-    --warning-orange: #a55a00;
-    --error-red: #b40018;
-    --text-dark: #1a1a1a;
-    --text-medium: #4b4442;
-    --text-light: #6f6562;
-    --surface-raised: #fffdf8;
-    --surface-inset: #ecebe5;
-    --shadow-color: rgba(180, 0, 24, 0.16);
-    --grid-line: rgba(180, 0, 24, 0.07);
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --color-brand-interactive: #60A5FA;
+    --color-app-background: #0B1120;
+    --color-surface: #111827;
+    --color-border: #334155;
+    --color-header-background: #0a0f1e;
+    --color-header-foreground: #FFFFFF;
+    --color-header-border: #334155;
+    --color-header-accent: #93C5FD;
+    --color-success-text: #6EE7B7;
+    --color-success-background: #064E3B;
+    --color-pending-text: #FCD34D;
+    --color-pending-background: #78350F;
+    --color-error-text: #FCA5A5;
+    --color-error-background: #7F1D1D;
+    --color-info-text: #93C5FD;
+    --color-info-background: #1E3A8A;
+    --color-text-primary: #F8FAFC;
+    --color-text-secondary: #CBD5E1;
+    --color-income: #5EEAD4;
+    --color-expense: #CBD5E1;
+    --white: #FFFFFF;
+    --light-blue: var(--color-info-background);
+    --medium-gray: var(--color-expense);
+    --light-gray: var(--color-text-secondary);
+    --off-white: var(--color-app-background);
+    --border-gray: var(--color-border);
+    --success-green: var(--color-success-text);
+    --warning-orange: var(--color-pending-text);
+    --error-red: var(--color-error-text);
+    --text-dark: var(--color-text-primary);
+    --text-medium: var(--color-text-secondary);
+    --text-light: var(--color-text-secondary);
+    --surface-raised: var(--color-surface);
+    --surface-inset: #0F172A;
+    --shadow-color: rgba(0, 0, 0, 0.28);
 }
 
 /* Reset y base */
@@ -61,8 +99,7 @@ body {
     background: var(--off-white);
     min-height: 100vh;
     font-weight: 400;
-    background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-    background-size: 28px 28px;
+    background-image: none;
 }
 
 /* Header corporativo */
@@ -348,24 +385,24 @@ body {
 }
 
 .hero-section {
-    background: #181818;
-    color: #ffffff;
+    background: var(--color-header-background);
+    color: var(--color-header-foreground);
     padding: 2.75rem 0;
     text-align: center;
     margin-bottom: 2rem;
-    border-top: 1px solid var(--primary-navy);
-    border-bottom: 1px solid var(--primary-navy);
+    border-top: 1px solid var(--color-header-border);
+    border-bottom: 1px solid var(--color-header-border);
 }
 
 .hero-section h1 {
-    color: #ff3333;
+    color: var(--color-header-foreground);
     font-family: var(--font-retro);
     font-size: 2rem;
     margin-bottom: 0.75rem;
 }
 
 .hero-section p {
-    color: #e0e0e0;
+    color: var(--color-text-secondary);
     font-family: var(--font-retro);
     font-size: 1rem;
 }
@@ -753,6 +790,523 @@ body {
 .login-header h1,
 .default-users h3 {
     color: var(--primary-navy);
+}
+
+/* Componentes semánticos para la paleta corporativa. */
+a:not(.btn) {
+    color: var(--color-brand-interactive);
+}
+
+.main-header {
+    background: var(--color-brand-primary);
+    border-bottom-color: var(--color-brand-interactive);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+}
+
+.card,
+.function-card,
+.login-card,
+.stats-card {
+    background: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.card-header {
+    border-bottom-color: var(--color-border);
+}
+
+.card-header h2,
+.card-header h4,
+.card-header h5,
+.function-card h3 {
+    color: var(--color-brand-primary);
+}
+
+.card-header.bg-success,
+.card-header.bg-info,
+.card-header.bg-primary,
+.card-header.bg-warning {
+    background: var(--color-brand-primary) !important;
+    color: var(--color-surface) !important;
+    border-bottom-color: var(--color-border);
+}
+
+.form-control,
+.list-group-item,
+.assistant-response,
+.default-users,
+.user-demo {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text-primary);
+}
+
+.form-control:focus,
+.form-control:focus-visible,
+input[type="number"]:focus,
+input[type="number"]:focus-visible,
+input[name*="salario"]:focus,
+input[name*="monto"]:focus,
+input[name*="valor"]:focus {
+    border-color: var(--color-brand-interactive);
+    outline: 2px solid rgba(37, 99, 235, 0.18);
+    outline-offset: 1px;
+    box-shadow: none;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.badge-success,
+.status-badge--success {
+    color: var(--color-success-text);
+    background: var(--color-success-background);
+}
+
+.badge-warning,
+.badge-pending,
+.status-badge--pending {
+    color: var(--color-pending-text);
+    background: var(--color-pending-background);
+}
+
+.badge-danger,
+.badge-error,
+.status-badge--error {
+    color: var(--color-error-text);
+    background: var(--color-error-background);
+}
+
+.badge-info,
+.status-badge--info {
+    color: var(--color-info-text);
+    background: var(--color-info-background);
+}
+
+.badge-primary,
+.badge-secondary {
+    color: var(--color-text-primary);
+    background: var(--color-app-background);
+}
+
+.alert-success {
+    background: var(--color-success-background) !important;
+    border-color: var(--color-success-background) !important;
+    color: var(--color-success-text) !important;
+}
+
+.alert-warning {
+    background: var(--color-pending-background) !important;
+    border-color: var(--color-pending-background) !important;
+    color: var(--color-pending-text) !important;
+}
+
+.alert-error,
+.alert-danger {
+    background: var(--color-error-background) !important;
+    border-color: var(--color-error-background) !important;
+    color: var(--color-error-text) !important;
+}
+
+.alert-info {
+    background: var(--color-info-background) !important;
+    border-color: var(--color-info-background) !important;
+    color: var(--color-info-text) !important;
+}
+
+.financial-amount,
+.financial-figure,
+.financial-total {
+    color: var(--color-text-primary) !important;
+    font-variant-numeric: tabular-nums;
+}
+
+.financial-amount--income,
+.financial-figure--income {
+    color: var(--color-income) !important;
+}
+
+.financial-amount--deduction,
+.financial-figure--deduction {
+    color: var(--color-expense) !important;
+}
+
+.data-label,
+.form-text,
+.text-muted {
+    color: var(--color-text-secondary) !important;
+}
+
+.data-value {
+    color: var(--color-text-primary) !important;
+}
+
+.data-value.financial-amount--income {
+    color: var(--color-income) !important;
+}
+
+.data-value.financial-amount--deduction {
+    color: var(--color-expense) !important;
+}
+
+.table,
+.table-responsive {
+    background: var(--color-surface) !important;
+    border: 1px solid var(--color-border) !important;
+    box-shadow: none;
+}
+
+.table th {
+    background: var(--color-brand-primary) !important;
+    color: var(--color-surface) !important;
+}
+
+.table td,
+.table tr,
+.table tbody,
+.table thead {
+    border-color: var(--color-border) !important;
+    color: var(--color-text-primary) !important;
+}
+
+.table tbody tr:nth-child(even),
+.table tbody tr:hover {
+    background: var(--color-app-background) !important;
+}
+
+.admin-users-page .stats-card,
+.admin-users-page .table,
+.admin-users-page .table thead,
+.admin-users-page .table tbody,
+.admin-users-page .table tr,
+.admin-users-page .table td,
+.admin-users-page .table th {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+}
+
+.admin-users-page .table th {
+    background-color: var(--color-brand-primary) !important;
+    color: var(--color-surface) !important;
+}
+
+.admin-users-page .stats-number {
+    color: var(--color-text-primary) !important;
+}
+
+.admin-users-page .stats-label {
+    color: var(--color-text-secondary) !important;
+}
+
+.admin-users-page .badge {
+    background: var(--color-app-background) !important;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary) !important;
+}
+
+.admin-users-page .badge-success {
+    color: var(--color-success-text) !important;
+    background: var(--color-success-background) !important;
+    border-color: var(--color-success-background);
+}
+
+.admin-users-page .badge-warning,
+.admin-users-page .badge-pending {
+    color: var(--color-pending-text) !important;
+    background: var(--color-pending-background) !important;
+}
+
+.admin-users-page .badge-danger,
+.admin-users-page .badge-error {
+    color: var(--color-error-text) !important;
+    background: var(--color-error-background) !important;
+}
+
+.admin-users-page .badge-info {
+    color: var(--color-info-text) !important;
+    background: var(--color-info-background) !important;
+}
+
+.admin-users-page .btn-group .btn.btn-outline {
+    background: var(--color-surface) !important;
+    border-color: var(--color-brand-interactive) !important;
+    color: var(--color-brand-interactive) !important;
+}
+
+.admin-users-page .btn-group .btn.btn-outline:hover,
+.admin-users-page .btn-group .btn.btn-outline:focus-visible {
+    background: var(--color-brand-interactive) !important;
+    color: var(--color-surface) !important;
+}
+
+.status-item > div:first-child {
+    color: var(--color-text-primary) !important;
+}
+
+:root:not([data-theme="light"]) .table,
+:root:not([data-theme="light"]) .table-sm,
+:root:not([data-theme="light"]) .table thead,
+:root:not([data-theme="light"]) .table tbody,
+:root:not([data-theme="light"]) .table tr,
+:root:not([data-theme="light"]) .table td,
+:root:not([data-theme="light"]) .table th {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+}
+
+:root:not([data-theme="light"]) .table th {
+    background-color: var(--color-brand-primary) !important;
+    color: var(--color-surface) !important;
+}
+
+:root[data-theme="dark"] .card-header h2,
+:root[data-theme="dark"] .card-header h4,
+:root[data-theme="dark"] .card-header h5,
+:root[data-theme="dark"] .function-card h3,
+:root[data-theme="dark"] .login-header h1,
+:root[data-theme="dark"] .default-users h3 {
+    color: var(--color-text-primary) !important;
+}
+
+:root[data-theme="dark"] .card-header.bg-success,
+:root[data-theme="dark"] .card-header.bg-info,
+:root[data-theme="dark"] .card-header.bg-primary,
+:root[data-theme="dark"] .card-header.bg-warning {
+    background: var(--color-brand-primary) !important;
+    color: var(--white) !important;
+}
+
+:root[data-theme="dark"] .hero-section h1,
+:root[data-theme="dark"] .table th {
+    color: var(--white) !important;
+}
+
+:root[data-theme="dark"] .table th {
+    background: var(--color-brand-primary) !important;
+}
+
+:root[data-theme="dark"] .theme-toggle {
+    border-color: var(--color-brand-interactive);
+    color: var(--white);
+}
+
+:root[data-theme="dark"] .btn-secondary,
+:root[data-theme="dark"] .btn[class*="btn-outline"] {
+    border-color: var(--color-brand-interactive);
+    color: var(--color-brand-interactive);
+}
+
+:root[data-theme="dark"] .btn-secondary:hover,
+:root[data-theme="dark"] .btn[class*="btn-outline"]:hover {
+    background: var(--color-brand-interactive);
+    color: #0B1120;
+}
+
+:root[data-theme="dark"] .card.bg-primary,
+:root[data-theme="dark"] .card.bg-success,
+:root[data-theme="dark"] .card.bg-info,
+:root[data-theme="dark"] .card.bg-warning {
+    color: var(--color-text-primary) !important;
+}
+
+.main-header {
+    background: var(--color-header-background);
+    color: var(--color-header-foreground);
+    border-bottom: 1px solid var(--color-header-border);
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.08);
+}
+
+.main-header .header-layout {
+    width: min(100%, 1440px);
+    min-height: 76px;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.header-left,
+.brand-lockup,
+.primary-nav,
+.header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.header-left {
+    min-width: 0;
+    gap: 2rem;
+}
+
+.brand-lockup {
+    flex: 0 0 auto;
+    gap: 0.75rem;
+    color: var(--color-header-foreground) !important;
+    text-decoration: none;
+}
+
+.brand-mark {
+    display: grid;
+    width: 2.5rem;
+    height: 2.75rem;
+    place-items: center;
+    color: var(--color-header-foreground);
+    flex: 0 0 auto;
+}
+
+.brand-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.brand-name {
+    display: flex;
+    max-width: 14rem;
+    flex-direction: column;
+    color: var(--color-header-foreground);
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.primary-nav {
+    align-self: stretch;
+    gap: 0.25rem;
+}
+
+.primary-nav a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding: 0 0.8rem;
+    border-bottom: 2px solid transparent;
+    color: var(--color-header-foreground) !important;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.primary-nav a:hover,
+.primary-nav a[aria-current="page"] {
+    color: var(--color-header-accent) !important;
+    border-bottom-color: var(--color-header-accent);
+}
+
+.primary-nav a:focus-visible,
+.brand-lockup:focus-visible {
+    outline: 2px solid var(--color-header-accent);
+    outline-offset: 3px;
+}
+
+.header-actions {
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.header-user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    color: var(--color-header-foreground);
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.header-user-name {
+    font-weight: 600;
+}
+
+.header-user-role {
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+}
+
+.header-logout {
+    padding: 0.55rem 0.8rem;
+    font-size: 0.78rem;
+}
+
+.theme-toggle {
+    border-color: var(--color-header-border);
+    color: var(--color-header-foreground);
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    text-transform: none;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+    background: var(--color-header-foreground);
+    color: var(--color-header-background);
+}
+
+@media (max-width: 1100px) {
+    .main-header .header-layout {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0.75rem 1.25rem;
+    }
+
+    .header-left {
+        flex: 1 1 100%;
+        justify-content: center;
+        gap: 1.25rem;
+    }
+
+    .header-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .main-header .header-layout {
+        gap: 0.65rem;
+    }
+
+    .header-left {
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .brand-mark {
+        width: 2rem;
+        height: 2.2rem;
+    }
+
+    .brand-name {
+        max-width: none;
+        font-size: 0.8rem;
+    }
+
+    .primary-nav {
+        max-width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .primary-nav a {
+        min-height: 38px;
+        padding: 0 0.55rem;
+        font-size: 0.82rem;
+    }
+
+    .header-user {
+        display: none;
+    }
 }
 
 @media (max-width: 768px) {

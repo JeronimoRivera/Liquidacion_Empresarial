@@ -97,7 +97,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h4 class="card-title">${{ "{:,.0f}".format(stats.promedio_salario) }}</h4>
+                            <h4 class="card-title financial-figure">${{ "{:,.0f}".format(stats.promedio_salario) }}</h4>
                             <p class="card-text">Promedio Salarios</p>
                         </div>
                         <div class="align-self-center">
@@ -113,7 +113,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h4 class="card-title">${{ "{:,.0f}".format(stats.total_pagado) }}</h4>
+                            <h4 class="card-title financial-figure">${{ "{:,.0f}".format(stats.total_pagado) }}</h4>
                             <p class="card-text">Total Pagado</p>
                         </div>
                         <div class="align-self-center">
@@ -165,27 +165,27 @@
                     <div class="row">
                         <div class="col-6">
                             <h6>Indemnización</h6>
-                            <h4 class="text-primary">${{ "{:,.0f}".format(total_por_componente.indemnizacion) }}</h4>
+                            <h4 class="financial-figure financial-figure--income">${{ "{:,.0f}".format(total_por_componente.indemnizacion) }}</h4>
                         </div>
                         <div class="col-6">
                             <h6>Vacaciones</h6>
-                            <h4 class="text-success">${{ "{:,.0f}".format(total_por_componente.vacaciones) }}</h4>
+                            <h4 class="financial-figure financial-figure--income">${{ "{:,.0f}".format(total_por_componente.vacaciones) }}</h4>
                         </div>
                         <div class="col-6">
                             <h6>Cesantías</h6>
-                            <h4 class="text-info">${{ "{:,.0f}".format(total_por_componente.cesantias) }}</h4>
+                            <h4 class="financial-figure financial-figure--income">${{ "{:,.0f}".format(total_por_componente.cesantias) }}</h4>
                         </div>
                         <div class="col-6">
                             <h6>Prima Servicios</h6>
-                            <h4 class="text-warning">${{ "{:,.0f}".format(total_por_componente.prima) }}</h4>
+                            <h4 class="financial-figure financial-figure--income">${{ "{:,.0f}".format(total_por_componente.prima) }}</h4>
                         </div>
                         <div class="col-6">
                             <h6>Intereses</h6>
-                            <h4 class="text-secondary">${{ "{:,.0f}".format(total_por_componente.intereses) }}</h4>
+                            <h4 class="financial-figure financial-figure--income">${{ "{:,.0f}".format(total_por_componente.intereses) }}</h4>
                         </div>
                         <div class="col-6">
                             <h6>Retención</h6>
-                            <h4 class="text-danger">${{ "{:,.0f}".format(total_por_componente.retencion) }}</h4>
+                            <h4 class="financial-figure financial-figure--deduction">${{ "{:,.0f}".format(total_por_componente.retencion) }}</h4>
                         </div>
                     </div>
                 </div>
@@ -228,7 +228,7 @@
                                     </td>
                                     <td>{{ empleado[1] }} {{ empleado[2] }}</td>
                                     <td>{{ empleado[3] }}</td>
-                                    <td class="font-weight-bold text-success">${{ "{:,.0f}".format(empleado[8]) }}</td>
+                                    <td class="font-weight-bold financial-amount financial-amount--income">${{ "{:,.0f}".format(empleado[8]) }}</td>
                                     <td>{{ empleado[6] }}</td>
                                 </tr>
                                 {% endfor %}
@@ -295,9 +295,9 @@
                             <h6>Valor Promedio por Liquidación</h6>
                             {% if stats.total_liquidaciones > 0 %}
                                 {% set promedio_liquidacion = stats.total_pagado / stats.total_liquidaciones %}
-                                <h4 class="text-primary">${{ "{:,.0f}".format(promedio_liquidacion) }}</h4>
+                                <h4 class="financial-figure">${{ "{:,.0f}".format(promedio_liquidacion) }}</h4>
                             {% else %}
-                                <h4 class="text-muted">$0</h4>
+                                <h4 class="financial-figure">$0</h4>
                             {% endif %}
                             <small class="text-muted">Por liquidación procesada</small>
                         </div>

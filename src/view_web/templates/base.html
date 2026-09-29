@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sistema de Liquidación Definitiva{% endblock %}</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Corporativo -->
@@ -13,38 +16,49 @@
 <body>
     <!-- Header Corporativo -->
     <header class="main-header">
-        <div class="container">
-            <div>
-                <h1>
-                    Sistema de Liquidación Definitiva
-                </h1>
-                <p>Plataforma Corporativa de Gestión de Recursos Humanos</p>
+        <div class="container header-layout">
+            <div class="header-left">
+                <a class="brand-lockup" href="{{ url_for('index') }}" aria-label="Sistema de Liquidación Definitiva, inicio">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg class="brand-icon" viewBox="0 0 64 72" focusable="false">
+                            <path d="M20 4h40v44L31 68 4 41V22L20 4Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="5" />
+                            <circle cx="45" cy="16" r="4" fill="currentColor" />
+                            <path d="m18 37 9 9 19-21" fill="none" stroke="currentColor" stroke-linecap="square" stroke-width="5" />
+                            <circle cx="27" cy="39" r="3.5" fill="#EF4444" />
+                        </svg>
+                    </span>
+                    <span class="brand-name">
+                        <span>Sistema de Liquidación</span>
+                        <span>Definitiva</span>
+                    </span>
+                </a>
+                <nav class="primary-nav" aria-label="Navegación principal">
+                    <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}aria-current="page"{% endif %}>Inicio</a>
+                    <a href="{{ url_for('consultar_usuario') }}" {% if request.endpoint == 'consultar_usuario' %}aria-current="page"{% endif %}>Empleados</a>
+                    <a href="{{ url_for('agregar_liquidacion') }}" {% if request.endpoint == 'agregar_liquidacion' %}aria-current="page"{% endif %}>Liquidaciones</a>
+                    {% if session.get('rol') == 'administrador' %}
+                    <a href="{{ url_for('admin_panel') }}" {% if request.endpoint == 'admin_panel' %}aria-current="page"{% endif %}>Administración</a>
+                    {% endif %}
+                </nav>
             </div>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Cambiar modo de color">
-                    <i class="fas fa-sun" aria-hidden="true"></i>
-                    <span>Modo día</span>
-                </button>
+            <div class="header-actions">
                 {% if session.get('user_id') %}
-                <div style="color: white; text-align: right;">
-                    <div style="font-size: 0.95rem; font-weight: 500;">
-                        {{ session.get('nombre') }} {{ session.get('apellido') }}
-                    </div>
-                    <div style="font-size: 0.85rem; color: #cbd5e1;">
+                <div class="header-user">
+                    <span class="header-user-name">{{ session.get('nombre') }} {{ session.get('apellido') }}</span>
+                    <span class="header-user-role">
                         {% if session.get('rol') == 'administrador' %}
                             Administrador de Sistema
                         {% else %}
                             Asistente de Recursos Humanos
                         {% endif %}
-                    </div>
+                    </span>
                 </div>
-                <a href="{{ url_for('logout') }}" class="btn btn-secondary" style="padding: 0.6rem 1.2rem;">
-                    Cerrar Sesión
-                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary header-logout">Cerrar sesión</a>
                 {% endif %}
-                <a href="{{ url_for('index') }}" class="btn btn-secondary">
-                    Inicio
-                </a>
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Cambiar modo de color">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                    <span>Modo noche</span>
+                </button>
             </div>
         </div>
     </header>
@@ -62,19 +76,6 @@
                 align-items: center; 
                 gap: 0.5rem;
                 font-weight: 400;
-                {% if category == 'success' %}
-                    background: rgba(5, 150, 105, 0.1);
-                    border: 1px solid rgba(5, 150, 105, 0.3);
-                    color: #059669;
-                {% elif category == 'error' %}
-                    background: rgba(220, 38, 38, 0.1);
-                    border: 1px solid rgba(220, 38, 38, 0.3);
-                    color: #dc2626;
-                {% else %}
-                    background: rgba(217, 119, 6, 0.1);
-                    border: 1px solid rgba(217, 119, 6, 0.3);
-                    color: #d97706;
-                {% endif %}
             ">
                 <span>{{ message }}</span>
             </div>
@@ -109,8 +110,8 @@
             const toggle = document.getElementById('theme-toggle');
             const savedTheme = localStorage.getItem('liquidacion-theme');
 
-            if (savedTheme === 'light') {
-                root.dataset.theme = 'light';
+            if (savedTheme === 'light' || savedTheme === 'dark') {
+                root.dataset.theme = savedTheme;
             }
 
             const updateToggle = () => {
