@@ -95,6 +95,30 @@
                 </a>
             </div>
 
+            <div class="function-card">
+                <h3>Proyección de Liquidación</h3>
+                <p>Compare una fecha de salida actual con una fecha futura y revise el cambio estimado por concepto.</p>
+                <a href="{{ url_for('proyeccion_liquidacion') }}" class="btn btn-primary">
+                    Comparar escenarios
+                </a>
+            </div>
+
+            <div class="function-card">
+                <h3>Mapa de Liquidación</h3>
+                <p>Consulte el desglose y la participación de cada concepto sin guardar datos del empleado.</p>
+                <a href="{{ url_for('mapa_liquidacion') }}" class="btn btn-secondary">
+                    Ver desglose
+                </a>
+            </div>
+
+            <div class="function-card">
+                <h3>Asistente de Decisiones</h3>
+                <p>Obtenga una comparación resumida entre la fecha de salida actual y una fecha propuesta.</p>
+                <a href="{{ url_for('asistente_decisiones') }}" class="btn btn-secondary">
+                    Evaluar fechas
+                </a>
+            </div>
+
             <!-- Funciones Administrativas (Solo Administrador) -->
             {% if session.get('rol') == 'administrador' %}
             <div class="function-card">

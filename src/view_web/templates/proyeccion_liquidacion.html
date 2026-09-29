@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Proyección de Liquidación{% endblock %}
+{% block content %}
+<div class="container tool-page">
+    <header class="tool-heading">
+        <p class="eyebrow">Planeación de salida</p>
+        <h1>Proyección de liquidación</h1>
+        <p>Compare los conceptos estimados para dos fechas de salida. Los resultados son orientativos.</p>
+    </header>
+    <section class="card" aria-labelledby="projection-form-title">
+        <div class="card-header"><h2 id="projection-form-title">Datos del escenario</h2></div>
+        <div class="card-body">
+            <form method="post" class="tool-form">
+                {% include "_csrf_field.html" %}
+                <div class="tool-form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="salario_basico">Salario mensual</label>
+                        <input class="form-control" type="number" min="1" step="0.01" id="salario_basico" name="salario_basico" value="{{ datos.get('salario_basico', '') }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="dias_acumulados_vacaciones">Días acumulados de vacaciones</label>
+                        <input class="form-control" type="number" min="0" step="1" id="dias_acumulados_vacaciones" name="dias_acumulados_vacaciones" value="{{ datos.get('dias_acumulados_vacaciones', '0') }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fecha_inicio_labores">Inicio de labores</label>
+                        <input class="form-control" type="text" inputmode="numeric" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" placeholder="dd/mm/aaaa" aria-describedby="date-format" id="fecha_inicio_labores" name="fecha_inicio_labores" value="{{ datos.get('fecha_inicio_labores', '') }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fecha_salida_actual">Fecha de salida actual</label>
+                        <input class="form-control" type="text" inputmode="numeric" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" placeholder="dd/mm/aaaa" aria-describedby="date-format" id="fecha_salida_actual" name="fecha_salida_actual" value="{{ datos.get('fecha_salida_actual', '') }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fecha_salida_proyectada">Fecha de salida propuesta</label>
+                        <input class="form-control" type="text" inputmode="numeric" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" placeholder="dd/mm/aaaa" aria-describedby="date-format" id="fecha_salida_proyectada" name="fecha_salida_proyectada" value="{{ datos.get('fecha_salida_proyectada', '') }}" required>
+                    </div>
+                </div>
+                <p class="form-hint" id="date-format">Escriba las fechas como día/mes/año.</p>
+                <button class="btn btn-primary" type="submit">Comparar escenarios</button>
+            </form>
+        </div>
+    </section>
+    {% if comparacion %}
+    <section class="card tool-results" aria-labelledby="projection-result-title" aria-live="polite">
+        <div class="card-header"><h2 id="projection-result-title">Resultado de la proyección</h2></div>
+        <div class="card-body">
+            <p>La fecha propuesta agrega {{ comparacion.dias_adicionales }} días al escenario actual.</p>
+            <div class="table-responsive">
+                <table class="table">
+                    <caption>Comparación de valores estimados por concepto</caption>
+                    <thead><tr><th scope="col">Concepto</th><th scope="col">Actual</th><th scope="col">Proyectado</th><th scope="col">Diferencia</th></tr></thead>
+                    <tbody>
+                    {% for clave, etiqueta in [('indemnizacion', 'Indemnización'), ('vacaciones', 'Vacaciones'), ('cesantias', 'Cesantías'), ('intereses_cesantias', 'Intereses sobre cesantías'), ('primas', 'Prima de servicios'), ('retencion_fuente', 'Retención en la fuente'), ('total_pagar', 'Total a pagar')] %}
+                        <tr><th scope="row">{{ etiqueta }}</th><td>${{ '{:,.2f}'.format(comparacion.actual[clave]) }}</td><td>${{ '{:,.2f}'.format(comparacion.proyectado[clave]) }}</td><td>${{ '{:,.2f}'.format(comparacion.diferencias[clave]) }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
