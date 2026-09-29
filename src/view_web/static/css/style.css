@@ -1421,6 +1421,38 @@ input[name*="valor"]:focus {
 
 html[data-a11y-font="small"] { font-size: 90%; }
 html[data-a11y-font="large"] { font-size: 120%; }
+html[data-a11y-font="large"] .main-header .header-layout {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem 1.25rem;
+    padding-block: 0.85rem;
+}
+html[data-a11y-font="large"] .header-left {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem 1rem;
+}
+html[data-a11y-font="large"] .primary-nav {
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+html[data-a11y-font="large"] .header-actions {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+html[data-a11y-font="large"] .header-user {
+    max-width: 100%;
+    align-items: center;
+    text-align: center;
+}
+@media (max-width: 1320px) {
+    html[data-a11y-font="large"] .primary-nav {
+        flex-basis: 100%;
+    }
+}
 html.a11y-dyslexia body,
 html.a11y-dyslexia body *:not(i[class*="fa"]):not(svg):not(path) { font-family: Verdana, Geneva, sans-serif !important; }
 html.a11y-spacing body,
