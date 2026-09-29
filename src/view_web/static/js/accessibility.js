@@ -6,7 +6,8 @@
     const storageKey = 'liquidacion-accessibility';
     const toggleNames = [
         'contrast', 'dyslexia', 'spacing', 'links', 'motion', 'focus', 'targets',
-        'guide', 'monochrome', 'reading', 'color-rg', 'color-by', 'cursor'
+        'guide', 'monochrome', 'reading', 'color-rg', 'color-by', 'cursor',
+        'align', 'headings'
     ];
     const defaults = Object.fromEntries([
         ['font', 'normal'],
@@ -18,9 +19,18 @@
         const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
         settings = { ...defaults, ...saved };
         if (!['small', 'normal', 'large'].includes(settings.font)) settings.font = 'normal';
+        toggleNames.forEach((name) => {
+            settings[name] = saved[name] === true;
+        });
     } catch {
         settings = { ...defaults };
     }
+
+    const readingGuide = document.createElement('div');
+    readingGuide.className = 'a11y-reading-guide';
+    readingGuide.setAttribute('aria-hidden', 'true');
+    readingGuide.hidden = true;
+    document.body.append(readingGuide);
 
     const announce = (message) => {
         const status = document.getElementById('a11y-status');
@@ -37,6 +47,7 @@
                 control.closest('.a11y-switch-row')?.classList.toggle('is-active', Boolean(settings[name]));
             }
         });
+        readingGuide.hidden = !settings.guide;
         document.querySelectorAll('[data-a11y-action^="font-"]').forEach((control) => {
             control.setAttribute('aria-pressed', String(control.dataset.a11yAction === `font-${settings.font}`));
         });
@@ -63,8 +74,7 @@
             announce('La lectura en voz alta no está disponible en este navegador.');
             return;
         }
-        const content = document.getElementById('main-content');
-        const text = content?.innerText.trim();
+        const text = document.body.innerText.trim();
         if (!text) return;
         stopReading();
         const utterance = new SpeechSynthesisUtterance(text);
@@ -73,7 +83,7 @@
         announce('Lectura en voz alta iniciada.');
     };
 
-    trigger?.addEventListener('click', () => setPanel(panel.hidden));
+    trigger?.addEventListener('click', () => setPanel(panel?.hidden ?? true));
     close?.addEventListener('click', () => {
         setPanel(false);
         trigger?.focus();
@@ -109,7 +119,7 @@
     });
     document.addEventListener('pointermove', (event) => {
         if (root.classList.contains('a11y-guide')) {
-            root.style.setProperty('--a11y-guide-y', `${event.clientY}px`);
+            readingGuide.style.top = `${event.clientY}px`;
         }
     });
     apply();
