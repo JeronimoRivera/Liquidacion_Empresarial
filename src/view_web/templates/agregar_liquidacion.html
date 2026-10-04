@@ -3,18 +3,26 @@
 {% block title %}Crear Liquidación{% endblock %}
 
 {% block content %}
-<!-- Botón de regreso -->
-<div class="mb-3">
-    <a href="{{ url_for('index') }}" class="btn btn-back">
-        <i class="fas fa-arrow-left"></i> Volver al Inicio
-    </a>
-</div>
-
 <div class="card">
     <div class="card-header bg-success text-white">
-        <h4><i class="fas fa-calculator"></i> Crear Nueva Liquidación</h4>
+        <p class="eyebrow">Cierre laboral · Recursos Humanos</p>
+        <h4 id="calculation-title"><i class="fas fa-calculator"></i> Calcular liquidación</h4>
     </div>
     <div class="card-body">
+        <nav class="calculation-journey" aria-label="Pasos para calcular la liquidación">
+            <ol>
+                <li class="{% if liquidacion %}is-complete{% else %}is-current{% endif %}" {% if not liquidacion %}aria-current="step"{% endif %}>
+                    <span>01</span><span><strong>Identificar</strong><small>Empleado</small></span>
+                </li>
+                <li class="{% if liquidacion %}is-complete{% else %}is-upcoming{% endif %}" {% if not liquidacion %}aria-current="false"{% endif %}>
+                    <span>02</span><span><strong>Calcular</strong><small>Conceptos</small></span>
+                </li>
+                <li class="{% if liquidacion %}is-current{% else %}is-upcoming{% endif %}" {% if liquidacion %}aria-current="step"{% endif %}>
+                    <span>03</span><span><strong>Revisar</strong><small>Resultado</small></span>
+                </li>
+            </ol>
+        </nav>
+        <p class="calculation-intro">Ingresa el ID del empleado. El sistema toma sus datos laborales y presenta el desglose antes de continuar.</p>
         <form method="POST" action="{{ url_for('agregar_liquidacion') }}">
             {% include "_csrf_field.html" %}
             <div class="row justify-content-center">
@@ -27,9 +35,9 @@
                             <i class="fas fa-hashtag"></i> ID del Empleado *
                         </label>
                         <input type="number" class="form-control" id="id_usuario" name="id_usuario" 
-                               placeholder="Ingrese el ID del empleado" min="1" required>
+                               placeholder="Ej. 1024" min="1" value="{{ request.form.get('id_usuario', '') }}" required aria-describedby="liquidation-id-help">
                         <small class="form-text text-muted">
-                            <i class="fas fa-info-circle"></i> Toda la información se obtendrá automáticamente desde los datos registrados del empleado
+                            <i class="fas fa-info-circle" aria-hidden="true"></i> <span id="liquidation-id-help">No necesitas volver a ingresar salario ni fechas.</span>
                         </small>
                     </div>
 
@@ -48,7 +56,7 @@
             <!-- Botones -->
             <div class="text-center mt-4">
                 <button type="submit" class="btn btn-success btn-lg">
-                    <i class="fas fa-calculator"></i> Calcular Liquidación Automática
+                    <i class="fas fa-calculator" aria-hidden="true"></i> Calcular y revisar
                 </button>
                 <a href="{{ url_for('index') }}" class="btn btn-secondary ms-2">
                     <i class="fas fa-times"></i> Cancelar
@@ -59,17 +67,17 @@
 </div>
 
 {% if desglose and liquidacion %}
-<div class="card">
+<section class="card calculation-result" aria-labelledby="calculation-result-title" aria-live="polite">
     <div class="card-header bg-info text-white">
-        <h5><i class="fas fa-list-ol"></i> Desglose de la liquidación</h5>
+        <div>
+            <p class="eyebrow">Paso 03 · Revisión</p>
+            <h5 id="calculation-result-title"><i class="fas fa-list-check" aria-hidden="true"></i> Resultado de la liquidación</h5>
+        </div>
+        <div class="calculation-total"><small>Total a pagar</small><strong>${{ "%.2f"|format(liquidacion[7]) }}</strong></div>
     </div>
     <div class="card-body">
-        <p class="text-muted mb-3">
-            <strong>Días trabajados:</strong> {{ desglose.dias }}
-            <span class="mx-2">|</span>
-            <strong>Años aplicados:</strong> {{ desglose.anios }}
-        </p>
-        <div class="list-group">
+        <div class="calculation-meta"><span><small>Días reconocidos</small><strong>{{ desglose.dias }}</strong></span><span><small>Años aplicados</small><strong>{{ desglose.anios }}</strong></span></div>
+        <div class="list-group calculation-breakdown">
             <div class="list-group-item">
                 <strong>Indemnización</strong><br>
                 ${{ "%.2f"|format(desglose.salario) }} x {{ desglose.anios }} años =
@@ -101,20 +109,19 @@
                 <strong class="financial-amount financial-amount--deduction">${{ "%.2f"|format(liquidacion[6]) }}</strong>
             </div>
         </div>
-        <div class="alert alert-success mt-3 mb-0">
-            <strong>Total:</strong> indemnización + vacaciones + cesantías + intereses + prima - retención =
-            <strong class="financial-total">${{ "%.2f"|format(liquidacion[7]) }}</strong>
+        <p class="calculation-note">Revisa cada concepto y el total. El resultado también fue informado por el sistema.</p>
+        <div class="calculation-next-actions">
+            <a href="{{ url_for('agregar_liquidacion') }}" class="btn btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> Nueva liquidación</a>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Volver al panel</a>
         </div>
     </div>
-</div>
+</section>
 {% endif %}
 
 <!-- Información sobre el cálculo -->
-<div class="card">
-    <div class="card-header bg-info text-white">
-        <h5><i class="fas fa-info-circle"></i> Información del Cálculo</h5>
-    </div>
-    <div class="card-body">
+<details class="calculation-guide">
+    <summary><i class="fas fa-circle-info" aria-hidden="true"></i> ¿Qué incluye el cálculo?</summary>
+    <div class="calculation-guide-content">
         <div class="row">
             <div class="col-md-6">
                 <h6><strong>La liquidación incluye:</strong></h6>
@@ -136,5 +143,5 @@
             </div>
         </div>
     </div>
-</div>
+</details>
 {% endblock %}
