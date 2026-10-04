@@ -3,179 +3,93 @@
 {% block title %}Centro de Control - Sistema de Liquidación Definitiva{% endblock %}
 
 {% block content %}
-<!-- Hero Section Corporativo -->
-<div class="hero-section">
-    <div class="container">
-        <h1>
-            Centro de Control Corporativo
-        </h1>
-        <p>
-            Plataforma Integral de Gestión de Liquidaciones Laborales
-        </p>
-    </div>
-</div>
-
-<div class="container">
-    <!-- Información del Usuario Actual -->
-    {% if session.get('user_id') %}
-    <div class="card">
-        <div class="card-header">
-            <h2>
-                Panel de Usuario
-            </h2>
+<section class="dashboard-hero">
+    <div class="container dashboard-hero-layout">
+        <div class="dashboard-intro">
+            <p class="eyebrow dashboard-eyebrow"><span></span> Espacio de trabajo · Recursos Humanos</p>
+            <h1>Un buen cierre<br>empieza con <em>claridad.</em></h1>
+            <p class="dashboard-lede">Cada historia laboral merece un proceso cuidadoso, transparente y bien hecho.</p>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-            <div>
-                <strong>Nombre Completo:</strong><br>
-                {{ session.get('nombre') }} {{ session.get('apellido') }}
+        <div class="settlement-illustration" aria-hidden="true">
+            <div class="ledger-paper">
+                <div class="ledger-paper-head">
+                    <span class="ledger-mark"><i class="fas fa-scale-balanced"></i></span>
+                    <span>RESUMEN DE SALIDA</span>
+                    <span class="ledger-code">LD / 01</span>
+                </div>
+                <div class="ledger-paper-title"><strong>Liquidación</strong><span>Desglose en orden</span></div>
+                <div class="ledger-divider"><span></span><span></span><span></span><span></span></div>
+                <div class="ledger-breakdown">
+                    <div><span class="ledger-bullet bullet-coral"></span><span>Indemnización</span><i></i></div>
+                    <div><span class="ledger-bullet bullet-lime"></span><span>Cesantías</span><i></i></div>
+                    <div><span class="ledger-bullet bullet-blue"></span><span>Vacaciones</span><i></i></div>
+                    <div><span class="ledger-bullet bullet-gold"></span><span>Prima de servicios</span><i></i></div>
+                </div>
+                <div class="ledger-paper-foot"><span>Un concepto a la vez</span><i class="fas fa-arrow-right"></i></div>
             </div>
+            <span class="ledger-stamp">CLARO<br>Y JUSTO</span>
+            <span class="ledger-spark" aria-hidden="true">✳</span>
+        </div>
+        <span class="hero-index" aria-hidden="true">LIQ / 2026</span>
+    </div>
+</section>
+
+<div class="container dashboard-content">
+    <section class="workspace-section" aria-labelledby="workspace-title">
+        <div class="section-heading">
             <div>
-                <strong>Nivel de Acceso:</strong><br>
+                <p class="eyebrow">Herramientas para cada etapa</p>
+                <h2 id="workspace-title">Tu mesa de trabajo.</h2>
+            </div>
+            <p>Desde el primer registro hasta el análisis final, cada acción importante está a un paso.</p>
+        </div>
+
+        <a class="workflow-spotlight" href="{{ url_for('agregar_liquidacion') }}">
+            <span class="spotlight-index" aria-hidden="true">01</span>
+            <span class="spotlight-copy">
+                <span class="spotlight-kicker">Acción principal · Liquidaciones</span>
+                <strong>Calcular liquidación</strong>
+                <span>Inicia con el ID del empleado y revisa cada concepto antes del cierre.</span>
+            </span>
+            <span class="spotlight-preview" aria-hidden="true">
+                <span class="spotlight-preview-label">DESGLOSE INCLUIDO</span>
+                <span class="spotlight-preview-items"><i>Indemnización</i><i>Cesantías</i><i>Vacaciones</i><i>Prima y retención</i></span>
+                <span class="spotlight-preview-rule"><i></i><i></i><i></i><i></i></span>
+            </span>
+            <span class="spotlight-action">Iniciar cálculo <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </a>
+
+        <div class="workspace-groups">
+            <section class="workspace-group" aria-labelledby="people-title">
+                <div class="group-heading"><span class="group-number">01</span><h3 id="people-title">Personas</h3></div>
+                <a class="workspace-link" href="{{ url_for('agregar_usuario') }}"><span class="workspace-link-icon"><i class="fas fa-user-plus" aria-hidden="true"></i></span><span><strong>Registrar empleado</strong><small>Crear un nuevo expediente laboral</small></span><i class="fas fa-arrow-up-right-from-square link-arrow" aria-hidden="true"></i></a>
+                <a class="workspace-link" href="{{ url_for('consultar_usuario') }}"><span class="workspace-link-icon"><i class="fas fa-magnifying-glass" aria-hidden="true"></i></span><span><strong>Consultar expediente</strong><small>Revisar datos y liquidaciones</small></span><i class="fas fa-arrow-up-right-from-square link-arrow" aria-hidden="true"></i></a>
+                <a class="workspace-link" href="{{ url_for('modificar_usuario') }}"><span class="workspace-link-icon"><i class="fas fa-user-pen" aria-hidden="true"></i></span><span><strong>Actualizar información</strong><small>Mantener los datos al día</small></span><i class="fas fa-arrow-up-right-from-square link-arrow" aria-hidden="true"></i></a>
+            </section>
+
+            <section class="workspace-group" aria-labelledby="settlement-title">
+                <div class="group-heading"><span class="group-number">02</span><h3 id="settlement-title">Liquidaciones</h3></div>
+                <a class="workspace-link" href="{{ url_for('proyeccion_liquidacion') }}"><span class="workspace-link-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span><span><strong>Proyectar escenarios</strong><small>Comparar fechas de salida y valores estimados</small></span><i class="fas fa-arrow-up-right-from-square link-arrow" aria-hidden="true"></i></a>
+                <a class="workspace-link" href="{{ url_for('mapa_liquidacion') }}"><span class="workspace-link-icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span><span><strong>Explorar el desglose</strong><small>Entender el peso de cada concepto</small></span><i class="fas fa-arrow-up-right-from-square link-arrow" aria-hidden="true"></i></a>
+                <a class="workspace-link" href="{{ url_for('asistente_decisiones') }}"><span class="workspace-link-icon"><i class="fas fa-scale-balanced" aria-hidden="true"></i></span><span><strong>Evaluar fechas</strong><small>Contrastar alternativas de salida</small></span><i class="fas fa-arrow-up-right-from-square link-arrow" aria-hidden="true"></i></a>
+            </section>
+
+            <section class="workspace-group" aria-labelledby="insights-title">
+                <div class="group-heading"><span class="group-number">03</span><h3 id="insights-title">Análisis y apoyo</h3></div>
+                <a class="workspace-link" href="{{ url_for('asistente_ia') }}"><span class="workspace-link-icon"><i class="fas fa-sparkles" aria-hidden="true"></i></span><span><strong>Asistente de consulta</strong><small>Resolver dudas operativas con IA</small></span><i class="fas fa-arrow-up-right-from-square link-arrow" aria-hidden="true"></i></a>
                 {% if session.get('rol') == 'administrador' %}
-                    <span style="color: var(--primary-navy); font-weight: 600;">
-                        Administrador de Sistema
-                    </span>
-                {% else %}
-                    <span style="color: var(--accent-blue); font-weight: 600;">
-                        Asistente de Recursos Humanos
-                    </span>
+                <a class="workspace-link" href="{{ url_for('admin_panel') }}"><span class="workspace-link-icon"><i class="fas fa-sliders" aria-hidden="true"></i></span><span><strong>Panel administrativo</strong><small>Indicadores y gestión del sistema</small></span><i class="fas fa-arrow-up-right-from-square link-arrow" aria-hidden="true"></i></a>
+                <a class="workspace-link" href="{{ url_for('eliminar_usuario') }}"><span class="workspace-link-icon"><i class="fas fa-user-minus" aria-hidden="true"></i></span><span><strong>Administrar empleados</strong><small>Eliminar registros de empleado</small></span><i class="fas fa-arrow-up-right-from-square link-arrow" aria-hidden="true"></i></a>
+                <a class="workspace-link" href="{{ url_for('eliminar_liquidacion') }}"><span class="workspace-link-icon"><i class="fas fa-file-circle-xmark" aria-hidden="true"></i></span><span><strong>Administrar liquidaciones</strong><small>Gestionar registros de liquidación</small></span><i class="fas fa-arrow-up-right-from-square link-arrow" aria-hidden="true"></i></a>
                 {% endif %}
-            </div>
+            </section>
         </div>
-    </div>
-    {% endif %}
+    </section>
 
-    <!-- Grid de Funciones Principales -->
-    <div class="card">
-        <div class="card-header">
-            <h2>
-                Funciones del Sistema
-            </h2>
-        </div>
-        
-        <div class="functions-grid">
-            <!-- Gestión de Empleados -->
-            <div class="function-card">
-                <h3>Gestión de Empleados</h3>
-                <p>Administre el registro completo de empleados con datos personales y laborales actualizados</p>
-                <div style="display: flex; gap: 0.75rem; justify-content: center;">
-                    <a href="{{ url_for('agregar_usuario') }}" class="btn btn-primary">
-                        Agregar
-                    </a>
-                    <a href="{{ url_for('consultar_usuario') }}" class="btn btn-secondary">
-                        Consultar
-                    </a>
-                </div>
-            </div>
-
-            <!-- Modificación de Datos -->
-            <div class="function-card">
-                <h3>Modificación de Datos</h3>
-                <p>Actualice información personal, salarial y contractual de los empleados registrados</p>
-                <a href="{{ url_for('modificar_usuario') }}" class="btn btn-primary">
-                    Modificar Empleado
-                </a>
-            </div>
-
-            <!-- Procesamiento de Liquidaciones -->
-            <div class="function-card">
-                <h3>Cálculo de Liquidaciones</h3>
-                <p>Procese liquidaciones definitivas con cálculos automatizados conforme a la legislación laboral</p>
-                <a href="{{ url_for('agregar_liquidacion') }}" class="btn btn-primary">
-                    Procesar Liquidación
-                </a>
-            </div>
-
-            <!-- Asistente IA -->
-            <div class="function-card">
-                <h3>Asistente IA Gemini</h3>
-                <p>Consulta rápida al modelo gratuito de Google Gemini para dudas operativas o explicaciones puntuales.</p>
-                <a href="{{ url_for('asistente_ia') }}" class="btn btn-secondary">
-                    Abrir Asistente
-                </a>
-            </div>
-
-            <div class="function-card">
-                <h3>Proyección de Liquidación</h3>
-                <p>Compare una fecha de salida actual con una fecha futura y revise el cambio estimado por concepto.</p>
-                <a href="{{ url_for('proyeccion_liquidacion') }}" class="btn btn-primary">
-                    Comparar escenarios
-                </a>
-            </div>
-
-            <div class="function-card">
-                <h3>Mapa de Liquidación</h3>
-                <p>Consulte el desglose y la participación de cada concepto sin guardar datos del empleado.</p>
-                <a href="{{ url_for('mapa_liquidacion') }}" class="btn btn-secondary">
-                    Ver desglose
-                </a>
-            </div>
-
-            <div class="function-card">
-                <h3>Asistente de Decisiones</h3>
-                <p>Obtenga una comparación resumida entre la fecha de salida actual y una fecha propuesta.</p>
-                <a href="{{ url_for('asistente_decisiones') }}" class="btn btn-secondary">
-                    Evaluar fechas
-                </a>
-            </div>
-
-            <!-- Funciones Administrativas (Solo Administrador) -->
-            {% if session.get('rol') == 'administrador' %}
-            <div class="function-card">
-                <h3>Funciones Administrativas</h3>
-                <p>Acceso completo a funciones de eliminación y gestión avanzada del sistema</p>
-                <div style="display: flex; gap: 0.75rem; justify-content: center;">
-                    <a href="{{ url_for('eliminar_usuario') }}" class="btn btn-secondary">
-                        Eliminar Usuario
-                    </a>
-                    <a href="{{ url_for('eliminar_liquidacion') }}" class="btn btn-secondary">
-                        Remover Liquidación
-                    </a>
-                </div>
-            </div>
-
-            <!-- Panel de Control Avanzado -->
-            <div class="function-card">
-                <h3>Panel de Control</h3>
-                <p>Estadísticas del sistema, reportes y herramientas de administración avanzada</p>
-                <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
-                    Administrar Sistema
-                </a>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Panel de Estado del Sistema -->
-    <div class="card">
-        <div class="card-header">
-            <h2>
-                Estado del Sistema
-            </h2>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
-            <div class="status-item">
-                <div style="font-size: 2rem; font-weight: 600; color: var(--success-green); margin-bottom: 0.5rem;">
-                    Sistema Operativo
-                </div>
-                <div style="font-size: 0.9rem; color: var(--text-medium);">100% Disponibilidad</div>
-            </div>
-            
-            <div class="status-item">
-                <div style="font-size: 2rem; font-weight: 600; color: var(--accent-blue); margin-bottom: 0.5rem;">
-                    Base de Datos
-                </div>
-                <div style="font-size: 0.9rem; color: var(--text-medium);">Conexión Estable</div>
-            </div>
-            
-            <div class="status-item">
-                <div style="font-size: 2rem; font-weight: 600; color: var(--primary-navy); margin-bottom: 0.5rem;">
-                    Empleados Activos
-                </div>
-                <div style="font-size: 0.9rem; color: var(--text-medium);">Sistema Actualizado</div>
-            </div>
-        </div>
-    </div>
+    <aside class="principles-strip" aria-label="Principios de gestión">
+        <div><span class="principle-mark">A</span><p><strong>Datos bajo control</strong><small>Acceso según responsabilidades</small></p></div>
+        <div><span class="principle-mark">B</span><p><strong>Cálculos transparentes</strong><small>Desglose visible por concepto</small></p></div>
+        <div><span class="principle-mark">C</span><p><strong>Registro responsable</strong><small>Operaciones con trazabilidad</small></p></div>
+    </aside>
 </div>
 {% endblock %}

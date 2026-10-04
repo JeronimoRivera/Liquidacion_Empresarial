@@ -7,7 +7,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Corporativo -->
@@ -15,8 +15,7 @@
     <script src="{{ url_for('static', filename='js/accessibility.js') }}" defer></script>
 </head>
 <body>
-    {% include "_accessibility_menu.html" %}
-    <!-- Header Corporativo -->
+    <!-- Navegación principal -->
     <header class="main-header">
         <div class="container header-layout">
             <div class="header-left">
@@ -61,6 +60,7 @@
                     <i class="fas fa-moon" aria-hidden="true"></i>
                     <span>Modo noche</span>
                 </button>
+                {% include "_accessibility_menu.html" %}
             </div>
         </div>
     </header>
@@ -68,18 +68,16 @@
     <!-- Mensajes de Sistema -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <div class="container" style="padding-top: 1.5rem;">
+        <div class="container flash-stack" aria-live="polite" aria-atomic="true">
             {% for category, message in messages %}
-            <div class="alert alert-{{ category }}" style="
-                padding: 1rem 1.5rem; 
-                margin-bottom: 1.5rem; 
-                border-radius: 4px; 
-                display: flex; 
-                align-items: center; 
-                gap: 0.5rem;
-                font-weight: 400;
-            ">
-                <span>{{ message }}</span>
+            {% set is_welcome = category == 'success' and message.startswith('Bienvenido') %}
+            <div class="alert alert-{{ category }} flash-message{% if is_welcome %} flash-message--welcome{% endif %}">
+                <span class="flash-icon" aria-hidden="true"><i class="fas fa-{% if is_welcome %}sparkles{% elif category == 'success' %}circle-check{% elif category in ['error', 'danger'] %}circle-exclamation{% elif category == 'warning' %}triangle-exclamation{% else %}circle-info{% endif %}"></i></span>
+                <span class="flash-copy">
+                    <span class="flash-kicker">{% if is_welcome %}Acceso confirmado{% elif category == 'success' %}Operación completada{% elif category in ['error', 'danger'] %}Revisa esta operación{% elif category == 'warning' %}Atención{% else %}Información{% endif %}</span>
+                    <span class="flash-text">{{ message }}</span>
+                </span>
+                <span class="flash-index" aria-hidden="true">{% if is_welcome %}01{% else %}<i class="fas fa-arrow-up-right-from-square"></i>{% endif %}</span>
             </div>
             {% endfor %}
         </div>
@@ -87,23 +85,14 @@
     {% endwith %}
 
     <!-- Contenido Principal -->
-    <main id="main-content" tabindex="-1">
+    <main id="main-content" class="main-content-shell" tabindex="-1">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer Corporativo (opcional) -->
-    <footer style="
-        margin-top: 4rem;
-        padding: 2rem 0;
-        background: var(--dark-gray);
-        color: var(--light-gray);
-        text-align: center;
-        font-size: 0.9rem;
-    ">
-        <div class="container">
-            <p>
-                2025 Sistema de Liquidación Definitiva - Plataforma Corporativa de RRHH
-            </p>
+    <footer class="site-footer">
+        <div class="container site-footer-inner">
+            <span>Sistema de Liquidación Definitiva</span>
+            <span>Gestión responsable de Recursos Humanos</span>
         </div>
     </footer>
     <script>

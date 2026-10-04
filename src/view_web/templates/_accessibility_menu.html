@@ -1,53 +1,66 @@
 <a class="a11y-skip-link" href="#main-content">Saltar al contenido principal</a>
 <section class="a11y-widget" aria-label="Opciones de accesibilidad">
-    <button type="button" class="a11y-trigger" id="a11y-trigger" aria-expanded="false" aria-controls="a11y-panel">
+    <button type="button" class="a11y-trigger" id="a11y-trigger" aria-label="Abrir opciones de accesibilidad" aria-expanded="false" aria-controls="a11y-panel">
         <i class="fas fa-universal-access" aria-hidden="true"></i>
         <span>Accesibilidad</span>
+        <span class="a11y-trigger-mark" aria-hidden="true">A+</span>
     </button>
     <div class="a11y-panel" id="a11y-panel" aria-labelledby="a11y-title" hidden>
         <div class="a11y-panel-header">
             <div>
-                <p class="a11y-kicker">Preferencias de visualización</p>
+                <p class="a11y-kicker"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Tu experiencia, a tu manera</p>
                 <h2 id="a11y-title">Accesibilidad</h2>
             </div>
-            <button type="button" class="a11y-close" id="a11y-close" aria-label="Cerrar opciones de accesibilidad">&times;</button>
+            <button type="button" class="a11y-close" id="a11y-close" aria-label="Cerrar opciones de accesibilidad"><i class="fas fa-xmark" aria-hidden="true"></i></button>
         </div>
         <div class="a11y-controls">
             <fieldset class="a11y-control-group">
-                <legend class="a11y-label">Tamaño del texto</legend>
+                <legend class="a11y-label"><i class="fas fa-text-height" aria-hidden="true"></i> Tamaño del texto</legend>
                 <div class="a11y-button-row">
-                    <button type="button" class="a11y-option" data-a11y-action="font-small" aria-pressed="false">Pequeño</button>
-                    <button type="button" class="a11y-option" data-a11y-action="font-normal" aria-pressed="true">Normal</button>
-                    <button type="button" class="a11y-option" data-a11y-action="font-large" aria-pressed="false">Grande</button>
+                    <button type="button" class="a11y-option" data-a11y-action="font-small" aria-pressed="false"><span class="a11y-size-sample">A</span> Pequeño</button>
+                    <button type="button" class="a11y-option" data-a11y-action="font-normal" aria-pressed="true"><span class="a11y-size-sample">A</span> Normal</button>
+                    <button type="button" class="a11y-option" data-a11y-action="font-large" aria-pressed="false"><span class="a11y-size-sample">A</span> Grande</button>
                 </div>
             </fieldset>
             <fieldset class="a11y-control-group">
-                <legend class="a11y-label">Lectura en voz alta</legend>
+                <legend class="a11y-label"><i class="fas fa-volume-high" aria-hidden="true"></i> Lectura al señalar</legend>
                 <div class="a11y-action-row">
-                    <button type="button" class="a11y-action" data-a11y-action="read"><i class="fas fa-volume-up" aria-hidden="true"></i> Leer página</button>
+                    <label class="a11y-switch-row a11y-hover-read"><input type="checkbox" data-a11y-toggle="hoverRead"><i class="fas fa-arrow-pointer" aria-hidden="true"></i><span>Leer al pasar o enfocar</span></label>
                     <button type="button" class="a11y-action" data-a11y-action="stop"><i class="fas fa-stop" aria-hidden="true"></i> Detener</button>
                 </div>
             </fieldset>
             <fieldset class="a11y-toggle-list">
-                <legend class="a11y-label">Visualización y navegación</legend>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="contrast"><span>Alto contraste</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="dyslexia"><span>Fuente de lectura clara</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="spacing"><span>Mayor espacio entre líneas</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="links"><span>Subrayar enlaces</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="motion"><span>Reducir movimiento</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="focus"><span>Resaltar foco del teclado</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="targets"><span>Ampliar controles</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="guide"><span>Guía de lectura</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="monochrome"><span>Escala de grises</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="reading"><span>Lectura simplificada</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="color-rg"><span>Ajuste de color rojo-verde</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="color-by"><span>Ajuste de color azul-amarillo</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="cursor"><span>Puntero grande y visible</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="align"><span>Alinear texto a la izquierda</span></label>
-                <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="headings"><span>Resaltar encabezados</span></label>
+                <legend class="a11y-label"><i class="fas fa-book-open" aria-hidden="true"></i> Lectura y texto</legend>
+                <div class="a11y-toggle-grid">
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="dyslexia"><i class="fas fa-font" aria-hidden="true"></i><span>Fuente clara</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="spacing"><i class="fas fa-arrows-up-down" aria-hidden="true"></i><span>Espacio entre líneas</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="reading"><i class="fas fa-align-left" aria-hidden="true"></i><span>Lectura simplificada</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="align"><i class="fas fa-bars-staggered" aria-hidden="true"></i><span>Alinear a la izquierda</span></label>
+                </div>
             </fieldset>
-            <button type="button" class="a11y-reset" data-a11y-action="reset">Restablecer preferencias</button>
-            <p class="a11y-status" id="a11y-status" role="status" aria-live="polite"></p>
+            <fieldset class="a11y-toggle-list">
+                <legend class="a11y-label"><i class="fas fa-eye" aria-hidden="true"></i> Visualización</legend>
+                <div class="a11y-toggle-grid">
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="contrast"><i class="fas fa-circle-half-stroke" aria-hidden="true"></i><span>Alto contraste</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="monochrome"><i class="fas fa-droplet-slash" aria-hidden="true"></i><span>Escala de grises</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="color-rg"><i class="fas fa-palette" aria-hidden="true"></i><span>Ajuste rojo-verde</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="color-by"><i class="fas fa-palette" aria-hidden="true"></i><span>Ajuste azul-amarillo</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="cursor"><i class="fas fa-arrow-pointer" aria-hidden="true"></i><span>Puntero grande</span></label>
+                </div>
+            </fieldset>
+            <fieldset class="a11y-toggle-list">
+                <legend class="a11y-label"><i class="fas fa-compass" aria-hidden="true"></i> Navegación y foco</legend>
+                <div class="a11y-toggle-grid">
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="links"><i class="fas fa-link" aria-hidden="true"></i><span>Subrayar enlaces</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="motion"><i class="fas fa-circle-pause" aria-hidden="true"></i><span>Reducir movimiento</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="focus"><i class="fas fa-crosshairs" aria-hidden="true"></i><span>Resaltar foco</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="targets"><i class="fas fa-expand" aria-hidden="true"></i><span>Ampliar controles</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="guide"><i class="fas fa-grip-lines" aria-hidden="true"></i><span>Guía de lectura</span></label>
+                    <label class="a11y-switch-row"><input type="checkbox" data-a11y-toggle="headings"><i class="fas fa-heading" aria-hidden="true"></i><span>Resaltar encabezados</span></label>
+                </div>
+            </fieldset>
+            <button type="button" class="a11y-reset" data-a11y-action="reset"><i class="fas fa-rotate-left" aria-hidden="true"></i> Restablecer preferencias</button>
+            <output class="a11y-status" id="a11y-status" aria-live="polite"></output>
         </div>
     </div>
 </section>
