@@ -29,29 +29,27 @@
         {% endif %}
     {% endwith %}
 
-    <main id="main-content" class="login-container" tabindex="-1">
-        <section class="login-story" aria-label="Sistema de Liquidación Definitiva">
-            <a class="login-brand" href="{{ url_for('login') }}" aria-label="Sistema de Liquidación Definitiva">
-                <span class="brand-mark" aria-hidden="true"><i class="fas fa-scale-balanced"></i></span>
-                <span>Liquidación<br>Definitiva</span>
-            </a>
-            <div class="login-story-copy">
-                <p class="eyebrow">Gestión laboral, con criterio</p>
-                <h1>El cierre de una etapa merece <em>claridad.</em></h1>
-                <p>Una herramienta para gestionar información laboral y liquidaciones con cuidado, orden y transparencia.</p>
+    <main id="main-content" class="login-shell" tabindex="-1">
+        <section class="login-card" aria-labelledby="login-title">
+            <div class="login-brand-panel">
+                <div class="brand-chip">Liquidación Definitiva</div>
+                <h1>Tu operación financiera, con claridad.</h1>
+                <p>Centraliza pagos, nóminas y liquidaciones con una experiencia segura y moderna para todo tu equipo.</p>
+                <ul class="feature-list" aria-label="Características principales">
+                    <li><i class="fas fa-shield-alt"></i> Acceso seguro</li>
+                    <li><i class="fas fa-bolt"></i> Procesos ágiles</li>
+                    <li><i class="fas fa-chart-line"></i> Visibilidad real</li>
+                </ul>
             </div>
-            <div class="login-story-foot"><span>01 — Recursos Humanos</span><span>Plataforma de gestión</span></div>
-            <span class="login-decorative-number" aria-hidden="true">LD</span>
-        </section>
 
-        <section class="login-form-panel" aria-labelledby="login-title">
-            <div class="login-form-inner">
+            <div class="login-form-panel">
                 <div class="login-form-topline">
-                    <p class="eyebrow">Acceso seguro</p>
-                    {% include "_accessibility_menu.html" %}
+                    <p class="eyebrow">Acceso</p>
                 </div>
-                <h2 id="login-title">Bienvenido de nuevo.</h2>
-                <p class="login-form-lede">Ingresa tus datos para abrir tu espacio de trabajo.</p>
+
+                <h2 id="login-title">Inicia sesión</h2>
+                <p class="login-form-lede">Ingresa tus credenciales para continuar con tu sesión.</p>
+
                 <form method="POST" action="{{ url_for('login') }}">
                     {% include "_csrf_field.html" %}
                     <div class="form-group">
@@ -68,14 +66,25 @@
                             <input type="password" class="form-control" id="password" name="password" placeholder="Tu contraseña" required autocomplete="current-password">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-login">Ingresar <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+
+                    <button type="submit" class="btn btn-login">
+                        <span>Ingresar</span>
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </button>
                 </form>
-                <details class="demo-access">
-                    <summary>Credenciales de demostración</summary>
-                    <div><span>Administrador · ID 1</span><code>admin123</code></div>
-                    <div><span>Asistente RR. HH. · ID 2</span><code>user123</code></div>
-                </details>
-                <p class="login-confidential"><i class="fas fa-lock" aria-hidden="true"></i> Acceso exclusivo para personal autorizado de Recursos Humanos</p>
+
+                <div class="login-security-card" aria-label="Seguridad del acceso">
+                    <div class="security-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="security-copy">
+                        <strong>Acceso protegido</strong>
+                        <span>Encriptación y validación segura</span>
+                    </div>
+                </div>
+
+                <div class="login-meta-row">
+                    <span><i class="fas fa-lock"></i> Datos protegidos</span>
+                    <span><i class="fas fa-headset"></i> Soporte 24/7</span>
+                </div>
             </div>
         </section>
     </main>
