@@ -4,38 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso al Sistema - Liquidación Definitiva</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Corporativo -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/accessibility.js') }}" defer></script>
 </head>
 <body>
     <!-- Mensajes del Sistema -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <div style="position: fixed; top: 2rem; right: 2rem; z-index: 1000; width: 350px;">
+        <div class="login-flashes" aria-live="polite">
             {% for category, message in messages %}
-            <div style="
-                padding: 1rem 1.25rem; 
-                margin-bottom: 1rem; 
-                border-radius: 12px; 
-                display: flex; 
-                align-items: center; 
-                gap: 1rem;
-                font-weight: 500;
-                box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-                {% if category == 'success' %}
-                    background: rgba(5, 150, 105, 0.1);
-                    border: 1px solid rgba(5, 150, 105, 0.3);
-                    color: #059669;
-                {% else %}
-                    background: rgba(220, 38, 38, 0.1);
-                    border: 1px solid rgba(220, 38, 38, 0.3);
-                    color: #dc2626;
-                {% endif %}
-            ">
-                <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}" style="font-size: 1.2rem;"></i>
+            <div class="alert alert-{{ category }}">
+                <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}" aria-hidden="true"></i>
                 <span>{{ message }}</span>
             </div>
             {% endfor %}
@@ -43,97 +29,65 @@
         {% endif %}
     {% endwith %}
 
-    <div class="login-container">
-        <div class="login-card">
-            <!-- Header Corporativo -->
-            <div class="login-header">
-                <h1>
-                    Sistema de Liquidación Definitiva
-                </h1>
-                <p>Plataforma Corporativa de Recursos Humanos</p>
+    <main id="main-content" class="login-shell" tabindex="-1">
+        <section class="login-card" aria-labelledby="login-title">
+            <div class="login-brand-panel">
+                <div class="brand-chip">Liquidación Definitiva</div>
+                <h1>Tu operación financiera, con claridad.</h1>
+                <p>Centraliza pagos, nóminas y liquidaciones con una experiencia segura y moderna para todo tu equipo.</p>
+                <ul class="feature-list" aria-label="Características principales">
+                    <li><i class="fas fa-shield-alt"></i> Acceso seguro</li>
+                    <li><i class="fas fa-bolt"></i> Procesos ágiles</li>
+                    <li><i class="fas fa-chart-line"></i> Visibilidad real</li>
+                </ul>
             </div>
 
-            <!-- Información de Acceso -->
-            <div class="default-users">
-                <h3>
-                    Credenciales de Acceso
-                </h3>
-                <div class="user-demo">
-                    <div>
-                        <strong>Administrador de Sistema</strong><br>
-                        <span style="font-size: 0.9rem; color: var(--text-medium);">ID: 1</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <strong>admin123</strong><br>
-                        <span style="font-size: 0.9rem; color: var(--text-medium);">Contraseña</span>
-                    </div>
-                </div>
-                <div class="user-demo">
-                    <div>
-                        <strong>Asistente de RRHH</strong><br>
-                        <span style="font-size: 0.9rem; color: var(--text-medium);">ID: 2</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <strong>user123</strong><br>
-                        <span style="font-size: 0.9rem; color: var(--text-medium);">Contraseña</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Formulario de Acceso -->
-            <form method="POST" action="{{ url_for('login') }}">
-                {% include "_csrf_field.html" %}
-                <div class="form-group">
-                    <label for="id_usuario" class="form-label">
-                        Identificación de Usuario
-                    </label>
-                    <input type="number" class="form-control" id="id_usuario" name="id_usuario" 
-                           placeholder="Ingrese su ID de usuario" 
-                           required 
-                           min="1"
-                           style="font-size: 1rem; padding: 1rem;">
+            <div class="login-form-panel">
+                <div class="login-form-topline">
+                    <p class="eyebrow">Acceso</p>
                 </div>
 
-                <div class="form-group">
-                    <label for="password" class="form-label">
-                        Contraseña de Acceso
-                    </label>
-                    <input type="password" class="form-control" id="password" name="password" 
-                           placeholder="Ingrese su contraseña" 
-                           required
-                           style="font-size: 1rem; padding: 1rem;">
-                </div>
+                <h2 id="login-title">Inicia sesión</h2>
+                <p class="login-form-lede">Ingresa tus credenciales para continuar con tu sesión.</p>
 
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary" style="
-                        width: 100%; 
-                        padding: 1rem 2rem; 
-                        font-size: 1rem; 
-                        font-weight: 500;
-                        margin-top: 1rem;
-                    ">
-                        Acceder al Sistema
+                <form method="POST" action="{{ url_for('login') }}">
+                    {% include "_csrf_field.html" %}
+                    <div class="form-group">
+                        <label for="id_usuario" class="form-label">Identificación de usuario</label>
+                        <div class="login-input-control">
+                            <i class="fas fa-id-card" aria-hidden="true"></i>
+                            <input type="number" class="form-control" id="id_usuario" name="id_usuario" placeholder="Tu número de identificación" required min="1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <div class="login-input-control">
+                            <i class="fas fa-lock" aria-hidden="true"></i>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Tu contraseña" required autocomplete="current-password">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-login">
+                        <span>Ingresar</span>
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </button>
-                </div>
-            </form>
+                </form>
 
-            <!-- Footer Informativo -->
-            <div style="
-                text-align: center; 
-                margin-top: 2rem; 
-                padding-top: 2rem; 
-                border-top: 1px solid var(--border-gray);
-                color: var(--text-medium);
-            ">
-                <p style="margin-bottom: 0.5rem; font-size: 0.9rem;">
-                    Sistema Seguro de Gestión de Liquidaciones
-                </p>
-                <p style="margin: 0; font-size: 0.8rem; color: var(--text-light);">
-                    Acceso autorizado únicamente para personal de Recursos Humanos
-                </p>
+                <div class="login-security-card" aria-label="Seguridad del acceso">
+                    <div class="security-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="security-copy">
+                        <strong>Acceso protegido</strong>
+                        <span>Encriptación y validación segura</span>
+                    </div>
+                </div>
+
+                <div class="login-meta-row">
+                    <span><i class="fas fa-lock"></i> Datos protegidos</span>
+                    <span><i class="fas fa-headset"></i> Soporte 24/7</span>
+                </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <!-- Script para mejorar la experiencia de usuario -->
     <script>

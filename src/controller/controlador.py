@@ -539,6 +539,93 @@ class BaseDeDatos:
         finally:
             _safe_close_conn(conn)
 
+    def obtener_empleados_con_liquidacion_pendiente(self, limite=10):
+        """Lista empleados retirados que aun no tienen liquidacion registrada."""
+        conn = self.conectar_db()
+        if not conn:
+            return []
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT u.ID_Usuario, u.Nombre, u.Apellido, u.Fecha_Salida, u.Salario
+                    FROM usuarios u
+                    LEFT JOIN liquidacion l ON l.ID_Usuario = u.ID_Usuario
+                    WHERE u.Fecha_Salida IS NOT NULL
+                      AND l.ID_Liquidacion IS NULL
+                    ORDER BY u.Fecha_Salida DESC
+                    LIMIT %s
+                    """,
+                    (limite,),
+                )
+                filas = cur.fetchall()
+                return [
+                    {
+                        "id": fila[0],
+                        "nombre": fila[1],
+                        "apellido": fila[2],
+                        "fecha_salida": fila[3],
+                        "salario": float(fila[4]) if fila[4] is not None else 0.0,
+                    }
+                    for fila in filas
+                ]
+        except psycopg2.Error as error:
+            logger.error("Error al consultar liquidaciones pendientes: %s", error)
+            return []
+        finally:
+            _safe_close_conn(conn)
+
+    def obtener_resumen_financiero_mensual(self, meses=6):
+        """Resume por mes liquidaciones creadas y sus retenciones."""
+        conn = self.conectar_db()
+        if not conn:
+            return []
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    WITH periodos AS (
+                        SELECT date_trunc('month', CURRENT_DATE) - (serie * INTERVAL '1 month') AS periodo
+                        FROM generate_series(0, %s - 1) AS serie
+                    ), resumen AS (
+                        SELECT date_trunc('month', a.Fecha_Hora) AS periodo,
+                               COUNT(DISTINCT l.ID_Liquidacion) AS cantidad,
+                               COALESCE(SUM(l.Total_A_Pagar), 0) AS total_pagado,
+                               COALESCE(SUM(l.Retencion_Fuente), 0) AS total_retenciones
+                        FROM auditoria a
+                        JOIN liquidacion l ON l.ID_Liquidacion = a.ID_Registro
+                        WHERE a.Accion = 'CREATE'
+                          AND a.Tabla_Afectada = 'liquidacion'
+                          AND a.Fecha_Hora >= date_trunc('month', CURRENT_DATE) - (%s * INTERVAL '1 month')
+                        GROUP BY date_trunc('month', a.Fecha_Hora)
+                    )
+                    SELECT TO_CHAR(periodos.periodo, 'YYYY-MM') AS mes,
+                           COALESCE(resumen.cantidad, 0),
+                           COALESCE(resumen.total_pagado, 0),
+                           COALESCE(resumen.total_retenciones, 0)
+                    FROM periodos
+                    LEFT JOIN resumen ON resumen.periodo = periodos.periodo
+                    ORDER BY periodos.periodo DESC
+                    """,
+                    (meses, meses),
+                )
+                filas = cur.fetchall()
+                return [
+                    {
+                        "mes": fila[0],
+                        "cantidad": int(fila[1]),
+                        "total_pagado": float(fila[2]),
+                        "total_retenciones": float(fila[3]),
+                        "promedio": float(fila[2]) / int(fila[1]) if fila[1] else 0.0,
+                    }
+                    for fila in filas
+                ]
+        except psycopg2.Error as error:
+            logger.error("Error al consultar el resumen financiero mensual: %s", error)
+            return []
+        finally:
+            _safe_close_conn(conn)
+
     def modificar_usuario(self, id_usuario, nombre, apellido, documento, correo, telefono, fecha_ingreso, fecha_salida, salario, usuario_sistema=None):
         conn = self.conectar_db()
         if not conn:

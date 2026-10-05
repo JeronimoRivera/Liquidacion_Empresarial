@@ -15,6 +15,8 @@ except Exception:
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from controller.controlador import BaseDeDatos
+from model.calculadora import CalculadoraLiquidacion
+from model.mapa_liquidacion import MapaLiquidacion
 
 try:
     import requests
@@ -257,6 +259,17 @@ def agregar_liquidacion():
         )
 
         if resultado_guardado:
+            try:
+                BaseDeDatos.registrar_auditoria(
+                    usuario_sistema=session.get('user_id'),
+                    accion='CREATE',
+                    tabla_afectada='liquidacion',
+                    id_registro=id_liquidacion,
+                    datos_nuevos=f'{{"id_usuario": {id_usuario}, "total_a_pagar": {total_a_pagar}}}',
+                    descripcion=f'Liquidación creada para empleado {id_usuario}',
+                )
+            except Exception as error:
+                logger.warning("No se pudo registrar la auditoría de liquidación: %s", error)
             flash(f"OK Liquidación creada exitosamente para el empleado {id_usuario}. Total a pagar: ${total_a_pagar:,.2f}", "success")
         else:
             flash("ERROR Error al guardar la liquidación en la base de datos", "error")
@@ -281,6 +294,75 @@ def agregar_liquidacion():
         )
 
     return render_template(TEMPLATE_AGREGAR_LIQUIDACION)
+
+
+@app.route('/proyeccion_liquidacion', methods=['GET', 'POST'])
+@login_required
+def proyeccion_liquidacion():
+    comparacion = None
+    datos = {}
+    if request.method == 'POST':
+        datos = request.form.to_dict()
+        try:
+            comparacion = CalculadoraLiquidacion().comparar_escenarios(
+                salario_basico=float(request.form['salario_basico']),
+                fecha_inicio_labores=request.form['fecha_inicio_labores'],
+                fecha_salida_actual=request.form['fecha_salida_actual'],
+                fecha_salida_proyectada=request.form['fecha_salida_proyectada'],
+                dias_acumulados_vacaciones=int(request.form['dias_acumulados_vacaciones']),
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            flash(f"No fue posible calcular la proyección: {error}", "error")
+    return render_template('proyeccion_liquidacion.html', comparacion=comparacion, datos=datos)
+
+
+@app.route('/mapa_liquidacion', methods=['GET', 'POST'])
+@login_required
+def mapa_liquidacion():
+    resultado = None
+    datos = {}
+    if request.method == 'POST':
+        datos = request.form.to_dict()
+        try:
+            resultado = MapaLiquidacion().generar(
+                salario_basico=float(request.form['salario_basico']),
+                fecha_inicio_labores=request.form['fecha_inicio_labores'],
+                fecha_salida=request.form['fecha_salida'],
+                dias_acumulados_vacaciones=int(request.form['dias_acumulados_vacaciones']),
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            flash(f"No fue posible analizar la liquidación: {error}", "error")
+    return render_template('mapa_liquidacion.html', resultado=resultado, datos=datos)
+
+
+@app.route('/asistente_decisiones', methods=['GET', 'POST'])
+@login_required
+def asistente_decisiones():
+    resultado = None
+    datos = {}
+    if request.method == 'POST':
+        datos = request.form.to_dict()
+        try:
+            comparacion = CalculadoraLiquidacion().comparar_escenarios(
+                salario_basico=float(request.form['salario_basico']),
+                fecha_inicio_labores=request.form['fecha_inicio_labores'],
+                fecha_salida_actual=request.form['fecha_salida_actual'],
+                fecha_salida_proyectada=request.form['fecha_salida_proyectada'],
+                dias_acumulados_vacaciones=int(request.form['dias_acumulados_vacaciones']),
+            )
+            diferencia = comparacion['diferencias']['total_pagar']
+            resultado = {
+                'comparacion': comparacion,
+                'diferencia_total': diferencia,
+                'mensaje': (
+                    'Recomendación: mantener la salida actual.'
+                    if diferencia <= 0
+                    else 'Recomendación: esperar la fecha propuesta para maximizar el valor final.'
+                ),
+            }
+        except (KeyError, TypeError, ValueError) as error:
+            flash(f"No fue posible generar la recomendación: {error}", "error")
+    return render_template('asistente_decisiones.html', resultado=resultado, datos=datos)
 
 
 @app.route('/consultar_usuario', methods=['GET', 'POST'])
@@ -352,10 +434,15 @@ def admin_panel():
         usuarios = bd.obtener_todos_usuarios()
         liquidaciones = bd.obtener_todas_liquidaciones()
         stats = bd.obtener_estadisticas()
+        empleados_pendientes = getattr(bd, 'obtener_empleados_con_liquidacion_pendiente', lambda: [])()
+        obtener_resumen = getattr(bd, 'obtener_resumen_financiero_mensual', None)
+        resumen_financiero = obtener_resumen() if obtener_resumen else []
         return render_template('admin_panel.html',
                                usuarios=usuarios,
                                liquidaciones=liquidaciones,
-                               stats=stats)
+                       stats=stats,
+                       resumen_financiero=resumen_financiero,
+                       empleados_pendientes=empleados_pendientes)
     except Exception as e:
         flash(f"Error al cargar el panel de administración: {str(e)}", "error")
         return redirect(url_for('index'))
