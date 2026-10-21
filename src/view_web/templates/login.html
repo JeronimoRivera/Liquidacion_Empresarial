@@ -53,10 +53,10 @@
                 <form method="POST" action="{{ url_for('login') }}">
                     {% include "_csrf_field.html" %}
                     <div class="form-group">
-                        <label for="id_usuario" class="form-label">Identificación de usuario</label>
+                        <label for="documento" class="form-label">Identificación de usuario</label>
                         <div class="login-input-control">
                             <i class="fas fa-id-card" aria-hidden="true"></i>
-                            <input type="number" class="form-control" id="id_usuario" name="id_usuario" placeholder="Tu número de identificación" required min="1">
+                            <input type="text" class="form-control" id="documento" name="documento" placeholder="Tu número de identificación" required autocomplete="username">
                         </div>
                     </div>
                     <div class="form-group">
@@ -72,6 +72,7 @@
                         <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </button>
                 </form>
+                <p class="login-register-link">¿No tienes cuenta? <a href="{{ url_for('registro') }}">Regístrate aquí</a></p>
 
                 <div class="login-security-card" aria-label="Seguridad del acceso">
                     <div class="security-icon"><i class="fas fa-shield-alt"></i></div>
@@ -93,11 +94,11 @@
     <script>
         // Auto-focus en el primer campo
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('id_usuario').focus();
+            document.getElementById('documento').focus();
         });
 
         // Mejorar navegación con Enter
-        document.getElementById('id_usuario').addEventListener('keypress', function(e) {
+        document.getElementById('documento').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 document.getElementById('password').focus();

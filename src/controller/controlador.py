@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import psycopg2
 import SecretConfig
 import json
+from werkzeug.security import check_password_hash, generate_password_hash
 
 # Asegura import relativo a la raíz del repo (conservado)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -47,7 +48,9 @@ class BaseDeDatos:
                 database=SecretConfig.PGDATABASE,
                 user=SecretConfig.PGUSER,
                 password=SecretConfig.PGPASSWORD,
-                port=SecretConfig.PGPORT
+                port=SecretConfig.PGPORT,
+                sslmode="require",
+                connect_timeout=10
             )
             return conn
         except psycopg2.Error as error:
@@ -74,8 +77,9 @@ class BaseDeDatos:
                     Fecha_Salida DATE,
                     Salario DECIMAL(10,2) NOT NULL,
                     Rol VARCHAR(20) DEFAULT 'usuario' CHECK (Rol IN ('administrador', 'usuario')),
-                    Password VARCHAR(100) DEFAULT 'password123'
+                    Password VARCHAR(255) DEFAULT 'password123'
                 );
+                ALTER TABLE usuarios ALTER COLUMN Password TYPE VARCHAR(255);
                 CREATE TABLE IF NOT EXISTS liquidacion (
                     ID_Liquidacion INT PRIMARY KEY,
                     Indemnizacion DECIMAL(10,2) NOT NULL,
@@ -90,7 +94,7 @@ class BaseDeDatos:
                 );
                 CREATE TABLE IF NOT EXISTS auditoria (
                     ID_Auditoria SERIAL PRIMARY KEY,
-                    Usuario_Sistema INT NOT NULL,
+                    Usuario_Sistema INT,
                     Accion VARCHAR(50) NOT NULL,
                     Tabla_Afectada VARCHAR(50) NOT NULL,
                     ID_Registro INT,
@@ -101,6 +105,7 @@ class BaseDeDatos:
                     Descripcion TEXT,
                     FOREIGN KEY (Usuario_Sistema) REFERENCES usuarios(ID_Usuario)
                 );
+                ALTER TABLE auditoria ALTER COLUMN Usuario_Sistema DROP NOT NULL;
             """)
             cursor.execute("""
                 INSERT INTO usuarios (ID_Usuario, Nombre, Apellido, Documento_Identidad, 
@@ -134,16 +139,37 @@ class BaseDeDatos:
             _safe_close(cursor)
             _safe_close_conn(conn)
 
-    def autenticar_usuario(self, id_usuario, password):
+    def autenticar_usuario(self, identificacion, password):
         conn = self.conectar_db()
         if not conn:
             return {'autenticado': False}
         try:
+            identificacion = str(identificacion).strip()
+            where_sql = "Documento_Identidad = %s"
+            parametros = [identificacion]
+            if identificacion.isdigit():
+                where_sql += " OR ID_Usuario = %s"
+                parametros.append(int(identificacion))
+
             with conn.cursor() as cur:
-                sql = "SELECT ID_Usuario, Nombre, Apellido, Rol FROM usuarios WHERE ID_Usuario = %s AND Password = %s"
-                cur.execute(sql, (id_usuario, password))
+                cur.execute(
+                    f"""
+                    SELECT ID_Usuario, Nombre, Apellido, Rol
+                    FROM usuarios
+                    WHERE ({where_sql})
+                      AND Password = %s
+                      AND POSITION(':' IN Password) = 0
+                    """,
+                    (*parametros, password)
+                )
                 usuario = cur.fetchone()
                 if usuario:
+                    if hasattr(conn, "commit"):
+                        cur.execute(
+                            "UPDATE usuarios SET Password = %s WHERE ID_Usuario = %s",
+                            (generate_password_hash(password), usuario[0])
+                        )
+                        conn.commit()
                     return {
                         'id': usuario[0],
                         'nombre': usuario[1],
@@ -151,13 +177,76 @@ class BaseDeDatos:
                         'rol': usuario[3],
                         'autenticado': True
                     }
-                else:
+
+                cur.execute(
+                    f"""
+                    SELECT ID_Usuario, Nombre, Apellido, Rol, Password
+                    FROM usuarios
+                    WHERE {where_sql}
+                    """,
+                    parametros
+                )
+                usuario = cur.fetchone()
+                if not usuario or len(usuario) < 5:
                     return {'autenticado': False}
+
+                try:
+                    password_valida = check_password_hash(usuario[4], password)
+                except (TypeError, ValueError):
+                    password_valida = False
+                if not password_valida:
+                    return {'autenticado': False}
+                return {
+                    'id': usuario[0],
+                    'nombre': usuario[1],
+                    'apellido': usuario[2],
+                    'rol': usuario[3],
+                    'autenticado': True
+                }
         except psycopg2.Error as error:
             print(f"Error en autenticación: {error}")
             logger.error("Error autenticando: %s", error)
             return {'autenticado': False}
         finally:
+            _safe_close_conn(conn)
+
+    def registrar_cuenta(
+        self, nombre, apellido, documento_identidad, correo_electronico,
+        telefono, fecha_ingreso, salario, password
+    ):
+        conn = self.conectar_db()
+        if not conn:
+            raise RuntimeError("No fue posible conectar con la base de datos.")
+        cursor = None
+        try:
+            cursor = conn.cursor()
+            cursor.execute("LOCK TABLE usuarios IN EXCLUSIVE MODE")
+            cursor.execute("SELECT COALESCE(MAX(ID_Usuario), 0) + 1 FROM usuarios")
+            id_usuario = cursor.fetchone()[0]
+            self._insertar_usuario(
+                cursor,
+                id_usuario,
+                nombre,
+                apellido,
+                documento_identidad,
+                correo_electronico,
+                telefono,
+                fecha_ingreso,
+                None,
+                salario,
+                "usuario",
+                generate_password_hash(password),
+            )
+            conn.commit()
+            return id_usuario
+        except Exception:
+            try:
+                conn.rollback()
+            except Exception as rollback_error:
+                logger.debug(ROLLBACK_ERR_MSG, rollback_error)
+            raise
+        finally:
+            _safe_close(cursor)
             _safe_close_conn(conn)
 
     def es_administrador(self, id_usuario):
@@ -706,7 +795,9 @@ class BaseDeDatos:
                 database=SecretConfig.PGDATABASE,
                 user=SecretConfig.PGUSER,
                 password=SecretConfig.PGPASSWORD,
-                port=SecretConfig.PGPORT
+                port=SecretConfig.PGPORT,
+                sslmode="require",
+                connect_timeout=10
             )
             if conn:
                 with conn.cursor() as cur:
@@ -736,7 +827,9 @@ class BaseDeDatos:
                 database=SecretConfig.PGDATABASE,
                 user=SecretConfig.PGUSER,
                 password=SecretConfig.PGPASSWORD,
-                port=SecretConfig.PGPORT
+                port=SecretConfig.PGPORT,
+                sslmode="require",
+                connect_timeout=10
             )
             if not conn:
                 return []
@@ -783,7 +876,9 @@ class BaseDeDatos:
                 database=SecretConfig.PGDATABASE,
                 user=SecretConfig.PGUSER,
                 password=SecretConfig.PGPASSWORD,
-                port=SecretConfig.PGPORT
+                port=SecretConfig.PGPORT,
+                sslmode="require",
+                connect_timeout=10
             )
             if not conn:
                 return {

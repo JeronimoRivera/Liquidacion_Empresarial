@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear cuenta - Liquidación Definitiva</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/accessibility.js') }}" defer></script>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="login-flashes" aria-live="polite">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}" aria-hidden="true"></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <main id="main-content" class="login-shell" tabindex="-1">
+        <section class="login-card registration-card" aria-labelledby="register-title">
+            <div class="login-brand-panel">
+                <div class="brand-chip">Liquidación Definitiva</div>
+                <h1>Un espacio de trabajo más claro.</h1>
+                <p>Crea tu cuenta para gestionar la información de tu equipo con una experiencia segura y sencilla.</p>
+                <ul class="feature-list" aria-label="Características principales">
+                    <li><i class="fas fa-shield-alt"></i> Contraseña protegida</li>
+                    <li><i class="fas fa-bolt"></i> Registro rápido</li>
+                    <li><i class="fas fa-users"></i> Acceso de asistente</li>
+                </ul>
+            </div>
+
+            <div class="login-form-panel">
+                <div class="login-form-topline"><p class="eyebrow">Nueva cuenta</p></div>
+                <h2 id="register-title">Crear cuenta</h2>
+                <p class="login-form-lede">Completa tus datos para registrarte como asistente administrativo.</p>
+
+                <form method="POST" action="{{ url_for('registro') }}">
+                    {% include "_csrf_field.html" %}
+                    <div class="registration-fields">
+                        <div class="form-group">
+                            <label for="nombre" class="form-label">Nombres</label>
+                            <div class="login-input-control">
+                                <i class="fas fa-user" aria-hidden="true"></i>
+                                <input class="form-control" id="nombre" name="nombre" maxlength="50" required autocomplete="given-name" value="{{ request.form.get('nombre', '') }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellido" class="form-label">Apellidos</label>
+                            <div class="login-input-control">
+                                <i class="fas fa-user" aria-hidden="true"></i>
+                                <input class="form-control" id="apellido" name="apellido" maxlength="50" required autocomplete="family-name" value="{{ request.form.get('apellido', '') }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="documento" class="form-label">Documento</label>
+                            <div class="login-input-control">
+                                <i class="fas fa-id-card" aria-hidden="true"></i>
+                                <input class="form-control" id="documento" name="documento" maxlength="20" required autocomplete="off" value="{{ request.form.get('documento', '') }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="correo_electronico" class="form-label">Correo electrónico</label>
+                            <div class="login-input-control">
+                                <i class="fas fa-envelope" aria-hidden="true"></i>
+                                <input class="form-control" type="email" id="correo_electronico" name="correo_electronico" maxlength="100" required autocomplete="email" value="{{ request.form.get('correo_electronico', '') }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <div class="login-input-control">
+                                <i class="fas fa-phone" aria-hidden="true"></i>
+                                <input class="form-control" type="tel" id="telefono" name="telefono" maxlength="20" required autocomplete="tel" value="{{ request.form.get('telefono', '') }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_ingreso" class="form-label">Fecha de ingreso</label>
+                            <div class="login-input-control">
+                                <i class="fas fa-calendar" aria-hidden="true"></i>
+                                <input class="form-control" type="date" id="fecha_ingreso" name="fecha_ingreso" required value="{{ request.form.get('fecha_ingreso', '') }}">
+                            </div>
+                        </div>
+                        <div class="form-group registration-field-full">
+                            <label for="salario" class="form-label">Salario</label>
+                            <div class="login-input-control">
+                                <i class="fas fa-dollar-sign" aria-hidden="true"></i>
+                                <input class="form-control" type="number" id="salario" name="salario" min="0" step="0.01" required value="{{ request.form.get('salario', '') }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <div class="login-input-control">
+                                <i class="fas fa-lock" aria-hidden="true"></i>
+                                <input class="form-control" type="password" id="password" name="password" minlength="8" maxlength="128" required autocomplete="new-password">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmar_password" class="form-label">Confirmar contraseña</label>
+                            <div class="login-input-control">
+                                <i class="fas fa-lock" aria-hidden="true"></i>
+                                <input class="form-control" type="password" id="confirmar_password" name="confirmar_password" minlength="8" maxlength="128" required autocomplete="new-password">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-login">
+                        <span>Crear cuenta</span>
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+                </form>
+                <p class="login-register-link">¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

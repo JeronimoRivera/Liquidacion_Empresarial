@@ -6,7 +6,8 @@ import SecretConfig
 
 def fix_database_precision():
     """Arregla la precisión de las columnas de la tabla liquidacion"""
-    
+    conn = None
+    cursor = None
     try:
         # Conectar directamente a la base de datos
         print('🔌 Conectando a la base de datos...')
@@ -15,9 +16,22 @@ def fix_database_precision():
             database=SecretConfig.PGDATABASE,
             user=SecretConfig.PGUSER,
             password=SecretConfig.PGPASSWORD,
-            port=SecretConfig.PGPORT
+            port=SecretConfig.PGPORT,
+            sslmode="require",
+            connect_timeout=10
         )
         cursor = conn.cursor()
+
+        print('Aplicando migraciones de autenticación para Neon...')
+        cursor.execute(
+            'ALTER TABLE usuarios ALTER COLUMN password TYPE VARCHAR(255);'
+        )
+        cursor.execute(
+            'ALTER TABLE auditoria ALTER COLUMN usuario_sistema DROP NOT NULL;'
+        )
+        conn.commit()
+        print('OK Password admite VARCHAR(255)')
+        print('OK auditoria.usuario_sistema admite NULL')
 
         print('MODIFICANDO Modificando estructura de tabla liquidacion...')
 
@@ -33,12 +47,9 @@ def fix_database_precision():
         ]
 
         for command in sql_commands:
-            try:
-                cursor.execute(command)
-                column_name = command.split()[4]  # Extrae el nombre de la columna
-                print(f'OK Columna {column_name} actualizada a DECIMAL(15,2)')
-            except Exception as e:
-                print(f'AVISO  Error ejecutando {command}: {e}')
+            cursor.execute(command)
+            column_name = command.split()[5]  # Extrae el nombre de la columna
+            print(f'OK Columna {column_name} actualizada a DECIMAL(15,2)')
 
         # Confirmar cambios
         conn.commit()
@@ -62,13 +73,21 @@ def fix_database_precision():
             else:
                 print(f'  {col[0]}: {col[1]}')
 
-        cursor.close()
-        conn.close()
         print('\n🎉 Base de datos arreglada exitosamente!')
         print('🔥 Ahora las liquidaciones pueden manejar valores hasta $999,999,999,999.99')
         
     except Exception as e:
         print(f'ERROR Error general: {e}')
+        if conn is not None:
+            conn.rollback()
+        raise
+    finally:
+        try:
+            if cursor is not None:
+                cursor.close()
+        finally:
+            if conn is not None:
+                conn.close()
 
 if __name__ == "__main__":
     fix_database_precision()
