@@ -74,7 +74,7 @@
                 </div>
                 <div class="data-row">
                     <span class="data-label">Salario:</span>
-                    <span class="data-value text-success">
+                    <span class="data-value financial-amount--income">
                         <strong>${{ "%.2f"|format(usuario[8]) }}</strong>
                     </span>
                 </div>
@@ -96,32 +96,32 @@
                 </div>
                 <div class="data-row">
                     <span class="data-label">Indemnización:</span>
-                    <span class="data-value text-success">${{ "%.2f"|format(liquidacion[1]) }}</span>
+                    <span class="data-value financial-amount financial-amount--income">${{ "%.2f"|format(liquidacion[1]) }}</span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Vacaciones:</span>
-                    <span class="data-value text-primary">${{ "%.2f"|format(liquidacion[2]) }}</span>
+                    <span class="data-value financial-amount financial-amount--income">${{ "%.2f"|format(liquidacion[2]) }}</span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Cesantías:</span>
-                    <span class="data-value text-warning">${{ "%.2f"|format(liquidacion[3]) }}</span>
+                    <span class="data-value financial-amount financial-amount--income">${{ "%.2f"|format(liquidacion[3]) }}</span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Intereses Cesantías:</span>
-                    <span class="data-value text-info">${{ "%.2f"|format(liquidacion[4]) }}</span>
+                    <span class="data-value financial-amount financial-amount--income">${{ "%.2f"|format(liquidacion[4]) }}</span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Prima Servicios:</span>
-                    <span class="data-value text-secondary">${{ "%.2f"|format(liquidacion[5]) }}</span>
+                    <span class="data-value financial-amount financial-amount--income">${{ "%.2f"|format(liquidacion[5]) }}</span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Retención:</span>
-                    <span class="data-value text-danger">-${{ "%.2f"|format(liquidacion[6]) }}</span>
+                    <span class="data-value financial-amount financial-amount--deduction">-${{ "%.2f"|format(liquidacion[6]) }}</span>
                 </div>
                 <div class="data-row">
                     <span class="data-label">Total a Pagar:</span>
                     <span class="data-value">
-                        <h5 class="text-success mb-0">${{ "%.2f"|format(liquidacion[7]) }}</h5>
+                        <h5 class="financial-total mb-0">${{ "%.2f"|format(liquidacion[7]) }}</h5>
                     </span>
                 </div>
             </div>

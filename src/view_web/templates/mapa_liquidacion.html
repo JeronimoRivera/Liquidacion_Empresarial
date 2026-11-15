@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Mapa de Liquidación{% endblock %}
+{% block content %}
+<div class="container tool-page">
+    <header class="tool-heading">
+        <p class="eyebrow">Desglose informativo</p>
+        <h1>Mapa de liquidación</h1>
+        <p>Revise la participación de cada concepto sin consultar ni guardar información personal.</p>
+    </header>
+    <section class="card" aria-labelledby="map-form-title">
+        <div class="card-header"><h2 id="map-form-title">Datos de cálculo</h2></div>
+        <div class="card-body">
+            <form method="post" class="tool-form">
+                {% include "_csrf_field.html" %}
+                <div class="tool-form-grid">
+                    <div class="form-group"><label class="form-label" for="salario_basico">Salario mensual</label><input class="form-control" type="number" min="1" step="0.01" id="salario_basico" name="salario_basico" value="{{ datos.get('salario_basico', '') }}" required></div>
+                    <div class="form-group"><label class="form-label" for="dias_acumulados_vacaciones">Días acumulados de vacaciones</label><input class="form-control" type="number" min="0" step="1" id="dias_acumulados_vacaciones" name="dias_acumulados_vacaciones" value="{{ datos.get('dias_acumulados_vacaciones', '0') }}" required></div>
+                    <div class="form-group"><label class="form-label" for="fecha_inicio_labores">Inicio de labores</label><input class="form-control" type="text" inputmode="numeric" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" placeholder="dd/mm/aaaa" aria-describedby="map-date-format" id="fecha_inicio_labores" name="fecha_inicio_labores" value="{{ datos.get('fecha_inicio_labores', '') }}" required></div>
+                    <div class="form-group"><label class="form-label" for="fecha_salida">Fecha de salida</label><input class="form-control" type="text" inputmode="numeric" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" placeholder="dd/mm/aaaa" aria-describedby="map-date-format" id="fecha_salida" name="fecha_salida" value="{{ datos.get('fecha_salida', '') }}" required></div>
+                </div>
+                <p class="form-hint" id="map-date-format">Escriba las fechas como día/mes/año.</p>
+                <button class="btn btn-primary" type="submit">Generar desglose</button>
+            </form>
+        </div>
+    </section>
+    {% if resultado %}
+    <section class="card tool-results" aria-labelledby="map-result-title" aria-live="polite">
+        <div class="card-header"><h2 id="map-result-title">Composición estimada</h2></div>
+        <div class="card-body">
+            <p>Mayor componente: <strong>{{ resultado.mayor_impacto.etiqueta }}</strong>. Total estimado: <strong>${{ '{:,.2f}'.format(resultado.total_pagar) }}</strong>.</p>
+            <ul class="component-list">
+                {% for componente in resultado.componentes %}
+                <li>
+                    <div class="component-label"><span>{{ componente.etiqueta }}</span><strong>${{ '{:,.2f}'.format(componente.valor) }} ({{ componente.porcentaje }}%)</strong></div>
+                    <div class="component-track" role="img" aria-label="{{ componente.etiqueta }}: {{ componente.porcentaje }} por ciento"><span style="width: {{ [componente.porcentaje, 100]|min }}%"></span></div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

@@ -103,3 +103,53 @@ def test_agregar_liquidacion_success_flow(client):
     # Luego, agregar liquidación (ruta usa sólo id_usuario del form)
     resp = client.post("/agregar_liquidacion", data={"id_usuario": "1"}, follow_redirects=False)
     assert resp.status_code in (301, 302)  # Redirige al index si todo sale OK
+
+
+@pytest.mark.parametrize(
+    ("path", "title"),
+    [
+        ("/proyeccion_liquidacion", "Proyección de liquidación"),
+        ("/mapa_liquidacion", "Mapa de liquidación"),
+        ("/asistente_decisiones", "Asistente de decisiones"),
+    ],
+)
+def test_nuevas_herramientas_renderizan_con_menu_accesible(client, path, title):
+    with client.session_transaction() as sess:
+        sess["user_id"] = 1
+        sess["nombre"] = "Admin"
+        sess["apellido"] = "Pruebas"
+        sess["rol"] = "administrador"
+
+    response = client.get(path)
+
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+    assert title in body
+    assert 'id="a11y-trigger"' in body
+    assert 'href="#main-content"' in body
+
+
+def test_mapa_y_proyeccion_renderizan_resultados(client):
+    with client.session_transaction() as sess:
+        sess["user_id"] = 1
+        sess["rol"] = "administrador"
+
+    datos_base = {
+        "salario_basico": "2000000",
+        "dias_acumulados_vacaciones": "0",
+        "fecha_inicio_labores": "01/01/2024",
+    }
+    proyeccion = client.post("/proyeccion_liquidacion", data={
+        **datos_base,
+        "fecha_salida_actual": "01/07/2024",
+        "fecha_salida_proyectada": "01/08/2024",
+    })
+    mapa = client.post("/mapa_liquidacion", data={
+        **datos_base,
+        "fecha_salida": "01/07/2024",
+    })
+
+    assert proyeccion.status_code == 200
+    assert "Resultado de la proyección" in proyeccion.get_data(as_text=True)
+    assert mapa.status_code == 200
+    assert "Composición estimada" in mapa.get_data(as_text=True)

@@ -3,6 +3,7 @@ import os
 import secrets  # Para generar una clave aleatoria segura
 import logging
 from datetime import date  # Para manejar fecha_salida None
+from decimal import Decimal, InvalidOperation
 
 # Carga opcional de variables desde .env en desarrollo (no requerido para CI)
 try:
@@ -15,6 +16,8 @@ except Exception:
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from controller.controlador import BaseDeDatos
+from model.calculadora import CalculadoraLiquidacion
+from model.mapa_liquidacion import MapaLiquidacion
 
 try:
     import requests
@@ -34,6 +37,7 @@ from view.console.consolacontrolador import (
 )
 
 from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response, jsonify
+import psycopg2
 
 # CSRF opcional: usa Flask-WTF si está instalado; si no, crea un stub que desactiva CSRF.
 HAS_FLASK_WTF = True
@@ -101,42 +105,141 @@ def admin_required(f):
     return decorated_function
 
 
+def _registrar_auditoria_auth(**datos):
+    try:
+        registrar = getattr(BaseDeDatos, "registrar_auditoria", None)
+        if registrar is not None:
+            registrar(**datos)
+    except Exception:
+        logger.exception("No se pudo registrar la auditoría de autenticación")
+
+
 # =============== RUTAS ===============
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        id_usuario = request.form['id_usuario']
-        password = request.form['password']
+        identificacion = (
+            request.form.get('documento', '').strip()
+            or request.form.get('id_usuario', '').strip()
+        )
+        password = request.form.get('password', '')
+        if not identificacion or not password:
+            _registrar_auditoria_auth(
+                usuario_sistema=None,
+                accion='LOGIN_FAILED',
+                tabla_afectada='usuarios',
+                ip_address=request.remote_addr,
+                descripcion='Intento de inicio de sesión fallido: faltan credenciales'
+            )
+            flash("Completa la identificación y la contraseña.", "error")
+            return render_template('login.html')
 
         bd = BaseDeDatos()
-        resultado = bd.autenticar_usuario(id_usuario, password)
+        resultado = bd.autenticar_usuario(identificacion, password)
 
         if resultado.get('autenticado'):
+            session.clear()
+            session['usuario_id'] = resultado['id']
             session['user_id'] = resultado['id']
             session['nombre'] = resultado['nombre']
             session['apellido'] = resultado['apellido']
             session['rol'] = resultado['rol']
 
-            # Registrar auditoría de login (mejor esfuerzo)
-            try:
-                BaseDeDatos.registrar_auditoria(
-                    usuario_sistema=resultado['id'],
-                    accion='LOGIN',
-                    tabla_afectada='usuarios',
-                    id_registro=resultado['id'],
-                    ip_address=request.remote_addr,
-                    descripcion=f'Inicio de sesión exitoso: {resultado["nombre"]} {resultado["apellido"]} ({resultado["rol"]})'
-                )
-            except Exception as e:
-                print(f"Error al registrar auditoría de login: {e}")
+            _registrar_auditoria_auth(
+                usuario_sistema=resultado['id'],
+                accion='LOGIN',
+                tabla_afectada='usuarios',
+                id_registro=resultado['id'],
+                ip_address=request.remote_addr,
+                descripcion=f'Inicio de sesión exitoso: {resultado["nombre"]} {resultado["apellido"]} ({resultado["rol"]})'
+            )
 
             flash(f"Bienvenido {resultado['nombre']} ({resultado['rol']})", "success")
-            return redirect(url_for('index'))
+            dashboard = 'admin_panel' if resultado['rol'] == 'administrador' else 'index'
+            return redirect(url_for(dashboard))
         else:
+            _registrar_auditoria_auth(
+                usuario_sistema=None,
+                accion='LOGIN_FAILED',
+                tabla_afectada='usuarios',
+                ip_address=request.remote_addr,
+                descripcion='Intento de inicio de sesión fallido: credenciales no válidas'
+            )
             flash("Credenciales incorrectas", "error")
 
     return render_template('login.html')
+
+
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        apellido = request.form.get('apellido', '').strip()
+        documento = request.form.get('documento', '').strip()
+        correo = request.form.get('correo_electronico', '').strip()
+        telefono = request.form.get('telefono', '').strip()
+        fecha_ingreso = request.form.get('fecha_ingreso', '').strip()
+        salario_texto = request.form.get('salario', '').strip()
+        password = request.form.get('password', '')
+        confirmar_password = request.form.get('confirmar_password', '')
+
+        if not all((nombre, apellido, documento, correo, telefono,
+                    fecha_ingreso, salario_texto, password, confirmar_password)):
+            flash("Campos obligatorios incompletos.", "error")
+            return render_template('registro.html')
+        if (len(nombre) > 50 or len(apellido) > 50 or len(documento) > 20
+                or len(correo) > 100 or len(telefono) > 20 or '@' not in correo):
+            flash("Revisa los datos ingresados: hay campos con formato o longitud inválidos.", "error")
+            return render_template('registro.html')
+        if len(password) < 8 or len(password) > 128:
+            flash("La contraseña debe tener entre 8 y 128 caracteres.", "error")
+            return render_template('registro.html')
+        if password != confirmar_password:
+            flash("Las contraseñas no coinciden.", "error")
+            return render_template('registro.html')
+
+        try:
+            fecha_ingreso_valida = date.fromisoformat(fecha_ingreso)
+            salario = Decimal(salario_texto)
+            if not salario.is_finite() or salario < 0:
+                raise InvalidOperation
+        except (ValueError, InvalidOperation):
+            flash("La fecha de ingreso o el salario no tienen un formato válido.", "error")
+            return render_template('registro.html')
+
+        try:
+            bd = BaseDeDatos()
+            usuario_id = bd.registrar_cuenta(
+                nombre=nombre,
+                apellido=apellido,
+                documento_identidad=documento,
+                correo_electronico=correo,
+                telefono=telefono,
+                fecha_ingreso=fecha_ingreso_valida,
+                salario=salario,
+                password=password,
+            )
+        except psycopg2.IntegrityError:
+            flash("Ya existe una cuenta con ese documento o correo electrónico.", "error")
+            return render_template('registro.html')
+        except Exception:
+            logger.exception("No se pudo completar el registro de usuario")
+            flash("No se pudo completar el registro. Inténtalo nuevamente.", "error")
+            return render_template('registro.html')
+
+        _registrar_auditoria_auth(
+            usuario_sistema=usuario_id,
+            accion='REGISTER',
+            tabla_afectada='usuarios',
+            id_registro=usuario_id,
+            ip_address=request.remote_addr,
+            descripcion=f'Nuevo usuario registrado: {nombre} {apellido} ({documento})'
+        )
+        flash("Usuario registrado exitosamente. Ya puedes iniciar sesión.", "success")
+        return redirect(url_for('login'))
+
+    return render_template('registro.html')
 
 
 @app.route('/logout')
@@ -257,6 +360,17 @@ def agregar_liquidacion():
         )
 
         if resultado_guardado:
+            try:
+                BaseDeDatos.registrar_auditoria(
+                    usuario_sistema=session.get('user_id'),
+                    accion='CREATE',
+                    tabla_afectada='liquidacion',
+                    id_registro=id_liquidacion,
+                    datos_nuevos=f'{{"id_usuario": {id_usuario}, "total_a_pagar": {total_a_pagar}}}',
+                    descripcion=f'Liquidación creada para empleado {id_usuario}',
+                )
+            except Exception as error:
+                logger.warning("No se pudo registrar la auditoría de liquidación: %s", error)
             flash(f"OK Liquidación creada exitosamente para el empleado {id_usuario}. Total a pagar: ${total_a_pagar:,.2f}", "success")
         else:
             flash("ERROR Error al guardar la liquidación en la base de datos", "error")
@@ -281,6 +395,75 @@ def agregar_liquidacion():
         )
 
     return render_template(TEMPLATE_AGREGAR_LIQUIDACION)
+
+
+@app.route('/proyeccion_liquidacion', methods=['GET', 'POST'])
+@login_required
+def proyeccion_liquidacion():
+    comparacion = None
+    datos = {}
+    if request.method == 'POST':
+        datos = request.form.to_dict()
+        try:
+            comparacion = CalculadoraLiquidacion().comparar_escenarios(
+                salario_basico=float(request.form['salario_basico']),
+                fecha_inicio_labores=request.form['fecha_inicio_labores'],
+                fecha_salida_actual=request.form['fecha_salida_actual'],
+                fecha_salida_proyectada=request.form['fecha_salida_proyectada'],
+                dias_acumulados_vacaciones=int(request.form['dias_acumulados_vacaciones']),
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            flash(f"No fue posible calcular la proyección: {error}", "error")
+    return render_template('proyeccion_liquidacion.html', comparacion=comparacion, datos=datos)
+
+
+@app.route('/mapa_liquidacion', methods=['GET', 'POST'])
+@login_required
+def mapa_liquidacion():
+    resultado = None
+    datos = {}
+    if request.method == 'POST':
+        datos = request.form.to_dict()
+        try:
+            resultado = MapaLiquidacion().generar(
+                salario_basico=float(request.form['salario_basico']),
+                fecha_inicio_labores=request.form['fecha_inicio_labores'],
+                fecha_salida=request.form['fecha_salida'],
+                dias_acumulados_vacaciones=int(request.form['dias_acumulados_vacaciones']),
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            flash(f"No fue posible analizar la liquidación: {error}", "error")
+    return render_template('mapa_liquidacion.html', resultado=resultado, datos=datos)
+
+
+@app.route('/asistente_decisiones', methods=['GET', 'POST'])
+@login_required
+def asistente_decisiones():
+    resultado = None
+    datos = {}
+    if request.method == 'POST':
+        datos = request.form.to_dict()
+        try:
+            comparacion = CalculadoraLiquidacion().comparar_escenarios(
+                salario_basico=float(request.form['salario_basico']),
+                fecha_inicio_labores=request.form['fecha_inicio_labores'],
+                fecha_salida_actual=request.form['fecha_salida_actual'],
+                fecha_salida_proyectada=request.form['fecha_salida_proyectada'],
+                dias_acumulados_vacaciones=int(request.form['dias_acumulados_vacaciones']),
+            )
+            diferencia = comparacion['diferencias']['total_pagar']
+            resultado = {
+                'comparacion': comparacion,
+                'diferencia_total': diferencia,
+                'mensaje': (
+                    'Recomendación: mantener la salida actual.'
+                    if diferencia <= 0
+                    else 'Recomendación: esperar la fecha propuesta para maximizar el valor final.'
+                ),
+            }
+        except (KeyError, TypeError, ValueError) as error:
+            flash(f"No fue posible generar la recomendación: {error}", "error")
+    return render_template('asistente_decisiones.html', resultado=resultado, datos=datos)
 
 
 @app.route('/consultar_usuario', methods=['GET', 'POST'])
@@ -352,10 +535,15 @@ def admin_panel():
         usuarios = bd.obtener_todos_usuarios()
         liquidaciones = bd.obtener_todas_liquidaciones()
         stats = bd.obtener_estadisticas()
+        empleados_pendientes = getattr(bd, 'obtener_empleados_con_liquidacion_pendiente', lambda: [])()
+        obtener_resumen = getattr(bd, 'obtener_resumen_financiero_mensual', None)
+        resumen_financiero = obtener_resumen() if obtener_resumen else []
         return render_template('admin_panel.html',
                                usuarios=usuarios,
                                liquidaciones=liquidaciones,
-                               stats=stats)
+                       stats=stats,
+                       resumen_financiero=resumen_financiero,
+                       empleados_pendientes=empleados_pendientes)
     except Exception as e:
         flash(f"Error al cargar el panel de administración: {str(e)}", "error")
         return redirect(url_for('index'))

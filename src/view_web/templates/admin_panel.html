@@ -136,6 +136,66 @@
         </div>
     </div>
 
+    <section class="admin-insights" aria-label="Alertas y resumen financiero">
+        <article class="card">
+            <div class="card-header">
+                <h2>Liquidaciones pendientes</h2>
+            </div>
+            <div class="card-body">
+                {% if empleados_pendientes %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <caption class="sr-only">Empleados retirados sin liquidación registrada</caption>
+                        <thead>
+                            <tr><th scope="col">Empleado</th><th scope="col">Fecha de salida</th><th scope="col">Salario</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for empleado in empleados_pendientes %}
+                            <tr>
+                                <td>{{ empleado.nombre }} {{ empleado.apellido }}</td>
+                                <td>{{ empleado.fecha_salida }}</td>
+                                <td>${{ "{:,.0f}".format(empleado.salario) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay liquidaciones pendientes para empleados retirados.</p>
+                {% endif %}
+            </div>
+        </article>
+        <article class="card">
+            <div class="card-header">
+                <h2>Resumen financiero mensual</h2>
+            </div>
+            <div class="card-body">
+                {% if resumen_financiero %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <caption class="sr-only">Liquidaciones y retenciones de los últimos meses</caption>
+                        <thead>
+                            <tr><th scope="col">Mes</th><th scope="col">Liquidaciones</th><th scope="col">Pagado</th><th scope="col">Retenciones</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for mes in resumen_financiero %}
+                            <tr>
+                                <th scope="row">{{ mes.mes }}</th>
+                                <td>{{ mes.cantidad }}</td>
+                                <td>${{ "{:,.0f}".format(mes.total_pagado) }}</td>
+                                <td>${{ "{:,.0f}".format(mes.total_retenciones) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay datos financieros mensuales disponibles.</p>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+
     <!-- Tabla de Usuarios Recientes -->
     <div class="row mb-4">
         <div class="col-md-6">

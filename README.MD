@@ -105,7 +105,7 @@ Esta herramienta automatiza todo ese proceso tedioso, cumpliendo con la legislac
 ## Requisitos del Sistema
 
 - Python 3.x instalado
-- PostgreSQL 13+ (base de datos en Neon Cloud)
+- PostgreSQL 13+ alojado exclusivamente en Neon
 - Flask y dependencias [`pip install flask psycopg2-binary`]
 - Conexión a internet para base de datos remota
 
@@ -120,12 +120,15 @@ Esta herramienta automatiza todo ese proceso tedioso, cumpliendo con la legislac
 
 2. Instala las dependencias necesarias:
     ```bash
-    pip install flask psycopg2-binary
+    pip install flask psycopg2-binary python-dotenv
     ```
 
 3. Configura la base de datos:
-    - Edita `SecretConfig.py` con las credenciales de tu base de datos PostgreSQL
-    - Ejecuta los scripts SQL en la carpeta `sql/` para crear las tablas necesarias
+    - Completa `HOST`, `USER`, `PASSWORD`, `PORT` y `DBNAME` en `.env` con las credenciales de Neon. También puedes establecer `NEON_DB_USER` en el entorno.
+    - Ejecuta `neon_schema.sql` en el SQL Editor de Neon para crear las tablas e índices.
+    - Ejecuta `python fix_database.py` para aplicar las migraciones de precisión y autenticación directamente en Neon.
+    - Comprueba la conexión con `python test_conexion.py`.
+    - Las cuentas creadas desde `/registro` reciben el rol de asistente; las cuentas administradoras deben asignarse por un administrador autorizado.
 
 4. Ejecuta la aplicación web:
     ```bash

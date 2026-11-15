@@ -9,6 +9,7 @@ if _SRC not in sys.path:
 
 # Importamos el módulo de la app Flask
 import view_web.flask_app as flask_app
+from flask import render_template, session
 
 
 # Dummy de BD para simular distintos escenarios en rutas
@@ -110,6 +111,24 @@ def test_index_with_session_renders_template(client, monkeypatch):
     resp = client.get("/")
     assert resp.status_code == 200
     assert "index.html" in resp.get_data(as_text=True)
+
+
+def test_dashboard_template_includes_monthly_subscriptions():
+    with flask_app.app.test_request_context("/"):
+        session["user_id"] = 1
+        session["rol"] = "administrador"
+        body = render_template("index.html")
+    assert 'id="subscription-title"' in body
+    assert 'data-category="personas"' in body
+    assert 'data-category="empresas"' in body
+    assert "$10.000" in body
+    assert "$80.000" in body
+    assert "Hasta 25 empleados" in body
+    assert "/ mes" in body
+    assert "data-billing=" not in body
+    assert "Personal Pro" not in body
+    assert "Empresa Plus" not in body
+    assert 'pricing.js' in body
 
 
 def test_agregar_liquidacion_invalid_id(client, monkeypatch):
