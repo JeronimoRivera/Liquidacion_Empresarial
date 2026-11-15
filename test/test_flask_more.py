@@ -113,17 +113,21 @@ def test_index_with_session_renders_template(client, monkeypatch):
     assert "index.html" in resp.get_data(as_text=True)
 
 
-def test_dashboard_template_includes_subscription_controls():
+def test_dashboard_template_includes_monthly_subscriptions():
     with flask_app.app.test_request_context("/"):
         session["user_id"] = 1
         session["rol"] = "administrador"
         body = render_template("index.html")
     assert 'id="subscription-title"' in body
-    assert 'data-billing="monthly"' in body
-    assert 'data-billing="annual"' in body
     assert 'data-category="personas"' in body
     assert 'data-category="empresas"' in body
-    assert 'data-annual-price="300000"' in body
+    assert "$10.000" in body
+    assert "$80.000" in body
+    assert "Hasta 25 empleados" in body
+    assert "/ mes" in body
+    assert "data-billing=" not in body
+    assert "Personal Pro" not in body
+    assert "Empresa Plus" not in body
     assert 'pricing.js' in body
 
 

@@ -3621,6 +3621,10 @@ html.a11y-guide .a11y-reading-guide:not([hidden]) {
     align-items: stretch;
     gap: 1rem;
 }
+.pricing-grid--single {
+    grid-template-columns: minmax(0, 430px);
+    justify-content: center;
+}
 .pricing-card {
     position: relative;
     display: flex;
